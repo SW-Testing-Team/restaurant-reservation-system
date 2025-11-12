@@ -21,8 +21,8 @@ export class Order extends Document {
   totalPrice: number;
 
   @Prop({
-    default: 'pending',
-    enum: ['pending', 'preparing', 'ready', 'delivered', 'cancelled'],
+    default: 'preparing',
+    enum: ['preparing', 'ready', 'cancelled'],
   })
   status: string;
 
