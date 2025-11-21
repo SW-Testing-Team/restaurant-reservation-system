@@ -10,13 +10,18 @@ exports.MenuModule = void 0;
 const common_1 = require("@nestjs/common");
 const menu_controller_1 = require("./menu.controller");
 const menu_service_1 = require("./menu.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const Menu_schema_1 = require("./models/Menu.schema");
 let MenuModule = class MenuModule {
 };
 exports.MenuModule = MenuModule;
 exports.MenuModule = MenuModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: Menu_schema_1.Menu.name, schema: Menu_schema_1.MenuSchema }]),
+        ],
         controllers: [menu_controller_1.MenuController],
-        providers: [menu_service_1.MenuService]
+        providers: [menu_service_1.MenuService],
     })
 ], MenuModule);
 //# sourceMappingURL=menu.module.js.map

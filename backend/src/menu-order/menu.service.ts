@@ -17,7 +17,7 @@ export class MenuService {
     if (title == null) {
       throw new BadRequestException('title is invalid');
     }
-    const newMenu = new this.menuModel(title);
+    const newMenu = new this.menuModel({ title: title });
     return newMenu.save();
   }
 
@@ -37,6 +37,9 @@ export class MenuService {
   }
 
   async addMenuItem(menuId: string, menuitem: MenuItem): Promise<Menu> {
+    if (this.menuModel.findById(menuId) == null) {
+      throw new NotFoundException(`Menu with ID ${menuId} not found`);
+    }
     if (!menuitem) throw new NotFoundException('menu item was not found');
 
     const updated = await this.menuModel
@@ -80,6 +83,7 @@ export class MenuService {
     if (!menu) {
       throw new NotFoundException(`Menu with ID ${id} not found`);
     }
-    return this.menuModel.findByIdAndDelete(id).exec();
+    await menu.deleteOne();
+    return menu;
   }
 }

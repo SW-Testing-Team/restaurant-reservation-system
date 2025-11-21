@@ -11,9 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuSchema = exports.Menu = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
 const MenuItem_schema_1 = require("./MenuItem.schema");
-let Menu = class Menu extends mongoose_2.Document {
+let Menu = class Menu {
     title;
     items;
 };
