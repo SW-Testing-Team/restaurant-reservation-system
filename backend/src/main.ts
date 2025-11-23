@@ -16,5 +16,8 @@ async function bootstrap() {
   });
 
   await app.listen(3000);
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3000);
+  app.useGlobalPipes(new ValidationPipe());
 }
 bootstrap();
