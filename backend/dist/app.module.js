@@ -16,6 +16,7 @@ const menu_module_1 = require("./menu-order/menu.module");
 const feedback_module_1 = require("./feedback/feedback.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
 const mongoose_1 = require("@nestjs/mongoose");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,7 +28,8 @@ exports.AppModule = AppModule = __decorate([
             menu_module_1.MenuModule,
             feedback_module_1.FeedbackModule,
             dashboard_module_1.DashboardModule,
-            mongoose_1.MongooseModule.forRoot('mongodb+srv://admin:C6xIzFO0lQyCDdCW@main.dzqmb8v.mongodb.net/'),
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
+            mongoose_1.MongooseModule.forRoot('mongodb+srv://admin:C6xIzFO0lQyCDdCW@main.dzqmb8v.mongodb.net'),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
