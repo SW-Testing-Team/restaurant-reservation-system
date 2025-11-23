@@ -19,7 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     DashboardModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(
-      'mongodb+srv://admin:C6xIzFO0lQyCDdCW@main.dzqmb8v.mongodb.net/restaurant',
+      'mongodb+srv://admin:C6xIzFO0lQyCDdCW@main.dzqmb8v.mongodb.net',
     ),
   ],
   controllers: [AppController],
