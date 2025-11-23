@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuController = void 0;
 const common_1 = require("@nestjs/common");
 const menu_service_1 = require("./menu.service");
+const CreateMenuItem_dto_1 = require("./DTO/CreateMenuItem.dto");
 let MenuController = class MenuController {
     MenuService;
     constructor(MenuService) {
@@ -23,14 +24,29 @@ let MenuController = class MenuController {
     getAllMenus() {
         return this.MenuService.getAllMenus();
     }
+    getMenuById(menuId) {
+        return this.MenuService.getMenuById(menuId);
+    }
+    CreateMenu(title) {
+        return this.MenuService.createMenu(title);
+    }
+    deleteMenu(menuId) {
+        return this.MenuService.deleteMenu(menuId);
+    }
+    createMenuItem(menuId, dto) {
+        return this.MenuService.createMenuItem(dto);
+    }
     addMenuItem(menuId, menuitemId) {
         return this.MenuService.addMenuItem(menuId, menuitemId);
     }
-    addMenu(title) {
-        return this.MenuService.createMenu(title);
+    removeMenuItem(menuId, menuitemId) {
+        return this.MenuService.removeMenuItem(menuId, menuitemId);
     }
-    createMenuItem(menuId, dto) {
-        return this.MenuService.createMenuItem(menuId, dto);
+    deleteMenuItem(menuitemId) {
+        return this.MenuService.deleteMenuItem(menuitemId);
+    }
+    updateMenuItem(menuitemId, dto) {
+        return this.MenuService.updateMenuItem(menuitemId, dto);
     }
 };
 exports.MenuController = MenuController;
@@ -41,7 +57,36 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MenuController.prototype, "getAllMenus", null);
 __decorate([
-    (0, common_1.Post)(':id/items/:itemId'),
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MenuController.prototype, "getMenuById", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)('title')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MenuController.prototype, "CreateMenu", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MenuController.prototype, "deleteMenu", null);
+__decorate([
+    (0, common_1.Post)(':id/items'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, CreateMenuItem_dto_1.CreateMenuItemDto]),
+    __metadata("design:returntype", Promise)
+], MenuController.prototype, "createMenuItem", null);
+__decorate([
+    (0, common_1.Patch)(':id/items/:itemId'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('itemId')),
     __metadata("design:type", Function),
@@ -49,20 +94,28 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MenuController.prototype, "addMenuItem", null);
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)('title')),
+    (0, common_1.Delete)(':id/items/:itemId'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('itemId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], MenuController.prototype, "removeMenuItem", null);
+__decorate([
+    (0, common_1.Delete)('/items/:itemId'),
+    __param(0, (0, common_1.Param)('itemId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], MenuController.prototype, "addMenu", null);
+], MenuController.prototype, "deleteMenuItem", null);
 __decorate([
-    (0, common_1.Post)(':id/items'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Patch)('/items/:itemId'),
+    __param(0, (0, common_1.Param)('itemId')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, CreateMenuItem_dto_1.CreateMenuItemDto]),
     __metadata("design:returntype", Promise)
-], MenuController.prototype, "createMenuItem", null);
+], MenuController.prototype, "updateMenuItem", null);
 exports.MenuController = MenuController = __decorate([
     (0, common_1.Controller)('menu'),
     __metadata("design:paramtypes", [menu_service_1.MenuService])

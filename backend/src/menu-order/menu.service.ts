@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Menu } from './models/Menu.schema';
 import { MenuItem } from './models/MenuItem.schema';
+import { CreateMenuItemDto } from './DTO/CreateMenuItem.dto';
 
 @Injectable()
 export class MenuService {
@@ -91,26 +92,18 @@ export class MenuService {
   }
 
   // Create a new MenuItem and attach it to a Menu
-  async createMenuItem(
-    menuId: string,
-    dto: {
-      name: string;
-      description?: string;
-      price: number;
-      category: string;
-      available?: boolean;
-      imageUrl?: string;
-    },
-  ): Promise<MenuItem> {
-    // 1. Validate menu exists
-    const menu = await this.menuModel.findById(menuId).exec();
-    if (!menu) {
-      throw new NotFoundException(`Menu with ID ${menuId} not found`);
-    }
-
-    // 2. Validate payload
+  async createMenuItem(dto: CreateMenuItemDto): Promise<MenuItem> {
     if (!dto || !dto.name || dto.price == null || !dto.category) {
       throw new BadRequestException('Invalid menu item payload');
+    }
+
+    const menuitem = await this.menuItemModel
+      .findOne({ name: dto.name, category: dto.category })
+      .exec();
+    if (menuitem) {
+      throw new BadRequestException(
+        `Menu item with name ${dto.name} in category ${dto.category} already exists`,
+      );
     }
 
     // 3. Create and save the MenuItem
@@ -125,15 +118,6 @@ export class MenuService {
 
     const savedItem = await newItem.save();
 
-    // 4. Attach the new item's ObjectId to the menu (avoid duplicates)
-    await this.menuModel
-      .findByIdAndUpdate(
-        menuId,
-        { $addToSet: { items: savedItem._id } },
-        { new: true },
-      )
-      .exec();
-
     return savedItem;
   }
 
@@ -145,5 +129,33 @@ export class MenuService {
     }
     await menu.deleteOne();
     return menu;
+  }
+
+  // Delete a MenuItem
+  async deleteMenuItem(menuItemId: string): Promise<MenuItem> {
+    // 1. Check menu exists
+    const menuItem = await this.menuItemModel.findById(menuItemId).exec();
+    if (!menuItem) {
+      throw new NotFoundException(`Menu with ID ${menuItemId} not found`);
+    }
+    await menuItem.deleteOne();
+    return menuItem;
+  }
+
+  async updateMenuItem(
+    menuItemId: string,
+    dto: CreateMenuItemDto,
+  ): Promise<MenuItem> {
+    const menuItem = await this.menuItemModel.findById(menuItemId).exec();
+    if (!menuItem) {
+      throw new NotFoundException(`Menu item with ID ${menuItemId} not found`);
+    }
+    menuItem.name = dto.name ?? menuItem.name;
+    menuItem.description = dto.description ?? menuItem.description;
+    menuItem.price = dto.price ?? menuItem.price;
+    menuItem.category = dto.category ?? menuItem.category;
+    menuItem.available = dto.available ?? menuItem.available;
+    menuItem.imageUrl = dto.imageUrl ?? menuItem.imageUrl;
+    return menuItem.save();
   }
 }

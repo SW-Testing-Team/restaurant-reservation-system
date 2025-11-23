@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 import { Menu } from './models/Menu.schema';
 import { MenuItem } from './models/MenuItem.schema';
+import { CreateMenuItemDto } from './DTO/CreateMenuItem.dto';
 export declare class MenuService {
     private menuModel;
     private menuItemModel;
@@ -10,13 +11,8 @@ export declare class MenuService {
     getMenuById(id: string): Promise<Menu>;
     addMenuItem(menuId: string, menuitemId: string): Promise<Menu>;
     removeMenuItem(menuId: string, menuItemId: string): Promise<Menu>;
-    createMenuItem(menuId: string, dto: {
-        name: string;
-        description?: string;
-        price: number;
-        category: string;
-        available?: boolean;
-        imageUrl?: string;
-    }): Promise<MenuItem>;
+    createMenuItem(dto: CreateMenuItemDto): Promise<MenuItem>;
     deleteMenu(id: string): Promise<Menu>;
+    deleteMenuItem(menuItemId: string): Promise<MenuItem>;
+    updateMenuItem(menuItemId: string, dto: CreateMenuItemDto): Promise<MenuItem>;
 }

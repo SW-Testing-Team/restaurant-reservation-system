@@ -75,13 +75,15 @@ let MenuService = class MenuService {
         }
         return updatedMenu;
     }
-    async createMenuItem(menuId, dto) {
-        const menu = await this.menuModel.findById(menuId).exec();
-        if (!menu) {
-            throw new common_1.NotFoundException(`Menu with ID ${menuId} not found`);
-        }
+    async createMenuItem(dto) {
         if (!dto || !dto.name || dto.price == null || !dto.category) {
             throw new common_1.BadRequestException('Invalid menu item payload');
+        }
+        const menuitem = await this.menuItemModel
+            .findOne({ name: dto.name, category: dto.category })
+            .exec();
+        if (menuitem) {
+            throw new common_1.BadRequestException(`Menu item with name ${dto.name} in category ${dto.category} already exists`);
         }
         const newItem = new this.menuItemModel({
             name: dto.name,
@@ -92,9 +94,6 @@ let MenuService = class MenuService {
             imageUrl: dto.imageUrl,
         });
         const savedItem = await newItem.save();
-        await this.menuModel
-            .findByIdAndUpdate(menuId, { $addToSet: { items: savedItem._id } }, { new: true })
-            .exec();
         return savedItem;
     }
     async deleteMenu(id) {
@@ -104,6 +103,27 @@ let MenuService = class MenuService {
         }
         await menu.deleteOne();
         return menu;
+    }
+    async deleteMenuItem(menuItemId) {
+        const menuItem = await this.menuItemModel.findById(menuItemId).exec();
+        if (!menuItem) {
+            throw new common_1.NotFoundException(`Menu with ID ${menuItemId} not found`);
+        }
+        await menuItem.deleteOne();
+        return menuItem;
+    }
+    async updateMenuItem(menuItemId, dto) {
+        const menuItem = await this.menuItemModel.findById(menuItemId).exec();
+        if (!menuItem) {
+            throw new common_1.NotFoundException(`Menu item with ID ${menuItemId} not found`);
+        }
+        menuItem.name = dto.name ?? menuItem.name;
+        menuItem.description = dto.description ?? menuItem.description;
+        menuItem.price = dto.price ?? menuItem.price;
+        menuItem.category = dto.category ?? menuItem.category;
+        menuItem.available = dto.available ?? menuItem.available;
+        menuItem.imageUrl = dto.imageUrl ?? menuItem.imageUrl;
+        return menuItem.save();
     }
 };
 exports.MenuService = MenuService;

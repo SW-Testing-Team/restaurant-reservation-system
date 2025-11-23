@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuSchema = exports.Menu = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-const MenuItem_schema_1 = require("./MenuItem.schema");
+const mongoose_2 = require("mongoose");
 let Menu = class Menu {
     title;
     items;
@@ -22,7 +22,7 @@ __decorate([
     __metadata("design:type", String)
 ], Menu.prototype, "title", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [MenuItem_schema_1.MenuItemSchema], default: [] }),
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'MenuItem' }] }),
     __metadata("design:type", Array)
 ], Menu.prototype, "items", void 0);
 exports.Menu = Menu = __decorate([
