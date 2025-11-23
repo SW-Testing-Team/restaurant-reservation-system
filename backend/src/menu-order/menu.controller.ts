@@ -5,7 +5,6 @@ import {
   Post,
   Get,
   Delete,
-  Put,
   Patch,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
