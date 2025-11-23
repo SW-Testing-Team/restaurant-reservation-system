@@ -9,6 +9,7 @@ import { AuthRepository } from './auth.repository';
 import { User, UserSchema } from './entities/user.schema';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RolesGuard } from './guards/roles.guard';
+import { CounterSchema } from 'src/common/schemas/counter.schema';
 
 @Module({
   imports: [
@@ -17,14 +18,21 @@ import { RolesGuard } from './guards/roles.guard';
     JwtModule.registerAsync({
         imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: async (config: ConfigService) => ({
+        useFactory: (config: ConfigService) => {
+            const expires = config.get<string>('JWT_EXPIRES_IN');
+
+            return {
             secret: config.get<string>('JWT_SECRET'),
             signOptions: {
-            expiresIn: config.get<string>('JWT_EXPIRES_IN') as any,
+                expiresIn: expires ? Number(expires) : 86400, // force number
             },
-        }),
+            };
+        },
     }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+        { name: User.name, schema: UserSchema },
+        { name: 'Counter', schema: CounterSchema },
+    ]),
   ],
   controllers: [AuthController],
   providers: [AuthService, AuthRepository, JwtStrategy, RolesGuard],
