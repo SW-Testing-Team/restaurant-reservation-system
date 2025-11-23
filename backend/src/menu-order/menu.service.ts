@@ -5,12 +5,15 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Menu, MenuDocument } from './models/Menu.schema';
+import { Menu } from './models/Menu.schema';
 import { MenuItem } from './models/MenuItem.schema';
 
 @Injectable()
 export class MenuService {
-  constructor(@InjectModel(Menu.name) private menuModel: Model<MenuDocument>) {}
+  constructor(
+    @InjectModel(Menu.name) private menuModel: Model<Menu>,
+    @InjectModel(MenuItem.name) private menuItemModel: Model<MenuItem>,
+  ) {}
 
   // Create a new menu
   async createMenu(title: string): Promise<Menu> {
@@ -36,26 +39,36 @@ export class MenuService {
     return menu;
   }
 
-  async addMenuItem(menuId: string, menuitem: MenuItem): Promise<Menu> {
-    if (this.menuModel.findById(menuId) == null) {
+  async addMenuItem(menuId: string, menuitemId: string): Promise<Menu> {
+    // 1. Check menu exists
+    const menu = await this.menuModel.findById(menuId).exec();
+    if (!menu) {
       throw new NotFoundException(`Menu with ID ${menuId} not found`);
     }
-    if (!menuitem) throw new NotFoundException('menu item was not found');
 
-    const updated = await this.menuModel
+    // 2. Check menu item exists
+    const menuitem = await this.menuItemModel.findById(menuitemId).exec();
+    if (!menuitem) {
+      throw new NotFoundException(`Menu item with ID ${menuitemId} not found`);
+    }
+
+    // 3. Update menu - save ONLY the ObjectId
+    const updatedMenu = await this.menuModel
       .findByIdAndUpdate(
         menuId,
-        { $addToSet: { items: menuitem } }, // prevents duplicates
+        {
+          $addToSet: { items: menuitem._id }, // Avoid duplicates
+        },
         { new: true },
       )
       .populate('items')
       .exec();
 
-    if (!updated) {
+    if (!updatedMenu) {
       throw new NotFoundException(`Menu with ID ${menuId} not found`);
     }
 
-    return updated;
+    return updatedMenu;
   }
 
   // Remove a MenuItem from a menu
@@ -75,6 +88,53 @@ export class MenuService {
       throw new NotFoundException(`Menu with ID ${menuId} not found`);
     }
     return updatedMenu;
+  }
+
+  // Create a new MenuItem and attach it to a Menu
+  async createMenuItem(
+    menuId: string,
+    dto: {
+      name: string;
+      description?: string;
+      price: number;
+      category: string;
+      available?: boolean;
+      imageUrl?: string;
+    },
+  ): Promise<MenuItem> {
+    // 1. Validate menu exists
+    const menu = await this.menuModel.findById(menuId).exec();
+    if (!menu) {
+      throw new NotFoundException(`Menu with ID ${menuId} not found`);
+    }
+
+    // 2. Validate payload
+    if (!dto || !dto.name || dto.price == null || !dto.category) {
+      throw new BadRequestException('Invalid menu item payload');
+    }
+
+    // 3. Create and save the MenuItem
+    const newItem = new this.menuItemModel({
+      name: dto.name,
+      description: dto.description,
+      price: dto.price,
+      category: dto.category,
+      available: dto.available ?? true,
+      imageUrl: dto.imageUrl,
+    });
+
+    const savedItem = await newItem.save();
+
+    // 4. Attach the new item's ObjectId to the menu (avoid duplicates)
+    await this.menuModel
+      .findByIdAndUpdate(
+        menuId,
+        { $addToSet: { items: savedItem._id } },
+        { new: true },
+      )
+      .exec();
+
+    return savedItem;
   }
 
   // Delete a menu

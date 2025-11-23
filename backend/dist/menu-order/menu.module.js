@@ -12,6 +12,7 @@ const menu_controller_1 = require("./menu.controller");
 const menu_service_1 = require("./menu.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const Menu_schema_1 = require("./models/Menu.schema");
+const MenuItem_schema_1 = require("./models/MenuItem.schema");
 let MenuModule = class MenuModule {
 };
 exports.MenuModule = MenuModule;
@@ -19,6 +20,9 @@ exports.MenuModule = MenuModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: Menu_schema_1.Menu.name, schema: Menu_schema_1.MenuSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: MenuItem_schema_1.MenuItem.name, schema: MenuItem_schema_1.MenuItemSchema },
+            ]),
         ],
         controllers: [menu_controller_1.MenuController],
         providers: [menu_service_1.MenuService],

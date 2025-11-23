@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const Menu_schema_1 = require("./models/Menu.schema");
+const MenuItem_schema_1 = require("./models/MenuItem.schema");
 let MenuService = class MenuService {
     menuModel;
-    constructor(menuModel) {
+    menuItemModel;
+    constructor(menuModel, menuItemModel) {
         this.menuModel = menuModel;
+        this.menuItemModel = menuItemModel;
     }
     async createMenu(title) {
         if (title == null) {
@@ -39,20 +42,25 @@ let MenuService = class MenuService {
         }
         return menu;
     }
-    async addMenuItem(menuId, menuitem) {
-        if (this.menuModel.findById(menuId) == null) {
+    async addMenuItem(menuId, menuitemId) {
+        const menu = await this.menuModel.findById(menuId).exec();
+        if (!menu) {
             throw new common_1.NotFoundException(`Menu with ID ${menuId} not found`);
         }
-        if (!menuitem)
-            throw new common_1.NotFoundException('menu item was not found');
-        const updated = await this.menuModel
-            .findByIdAndUpdate(menuId, { $addToSet: { items: menuitem } }, { new: true })
+        const menuitem = await this.menuItemModel.findById(menuitemId).exec();
+        if (!menuitem) {
+            throw new common_1.NotFoundException(`Menu item with ID ${menuitemId} not found`);
+        }
+        const updatedMenu = await this.menuModel
+            .findByIdAndUpdate(menuId, {
+            $addToSet: { items: menuitem._id },
+        }, { new: true })
             .populate('items')
             .exec();
-        if (!updated) {
+        if (!updatedMenu) {
             throw new common_1.NotFoundException(`Menu with ID ${menuId} not found`);
         }
-        return updated;
+        return updatedMenu;
     }
     async removeMenuItem(menuId, menuItemId) {
         if (!menuItemId) {
@@ -67,6 +75,28 @@ let MenuService = class MenuService {
         }
         return updatedMenu;
     }
+    async createMenuItem(menuId, dto) {
+        const menu = await this.menuModel.findById(menuId).exec();
+        if (!menu) {
+            throw new common_1.NotFoundException(`Menu with ID ${menuId} not found`);
+        }
+        if (!dto || !dto.name || dto.price == null || !dto.category) {
+            throw new common_1.BadRequestException('Invalid menu item payload');
+        }
+        const newItem = new this.menuItemModel({
+            name: dto.name,
+            description: dto.description,
+            price: dto.price,
+            category: dto.category,
+            available: dto.available ?? true,
+            imageUrl: dto.imageUrl,
+        });
+        const savedItem = await newItem.save();
+        await this.menuModel
+            .findByIdAndUpdate(menuId, { $addToSet: { items: savedItem._id } }, { new: true })
+            .exec();
+        return savedItem;
+    }
     async deleteMenu(id) {
         const menu = await this.menuModel.findById(id).exec();
         if (!menu) {
@@ -80,6 +110,8 @@ exports.MenuService = MenuService;
 exports.MenuService = MenuService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(Menu_schema_1.Menu.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(MenuItem_schema_1.MenuItem.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], MenuService);
 //# sourceMappingURL=menu.service.js.map

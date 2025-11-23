@@ -12,15 +12,31 @@ export class MenuController {
     return this.MenuService.getAllMenus();
   }
 
-  @Post(':id/items')
+  @Post(':id/items/:itemId')
   addMenuItem(
     @Param('id') menuId: string,
-    @Body() menuitem: MenuItem,
+    @Param('itemId') menuitemId: string,
   ): Promise<Menu> {
-    return this.MenuService.addMenuItem(menuId, menuitem);
+    return this.MenuService.addMenuItem(menuId, menuitemId);
   }
   @Post()
   addMenu(@Body('title') title: string): Promise<Menu> {
     return this.MenuService.createMenu(title);
+  }
+
+  @Post(':id/items')
+  createMenuItem(
+    @Param('id') menuId: string,
+    @Body()
+    dto: {
+      name: string;
+      description?: string;
+      price: number;
+      category: string;
+      available?: boolean;
+      imageUrl?: string;
+    },
+  ): Promise<MenuItem> {
+    return this.MenuService.createMenuItem(menuId, dto);
   }
 }

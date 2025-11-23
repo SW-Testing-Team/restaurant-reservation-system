@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuController = void 0;
 const common_1 = require("@nestjs/common");
 const menu_service_1 = require("./menu.service");
-const MenuItem_schema_1 = require("./models/MenuItem.schema");
 let MenuController = class MenuController {
     MenuService;
     constructor(MenuService) {
@@ -24,11 +23,14 @@ let MenuController = class MenuController {
     getAllMenus() {
         return this.MenuService.getAllMenus();
     }
-    addMenuItem(menuId, menuitem) {
-        return this.MenuService.addMenuItem(menuId, menuitem);
+    addMenuItem(menuId, menuitemId) {
+        return this.MenuService.addMenuItem(menuId, menuitemId);
     }
     addMenu(title) {
         return this.MenuService.createMenu(title);
+    }
+    createMenuItem(menuId, dto) {
+        return this.MenuService.createMenuItem(menuId, dto);
     }
 };
 exports.MenuController = MenuController;
@@ -39,11 +41,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MenuController.prototype, "getAllMenus", null);
 __decorate([
-    (0, common_1.Post)(':id/items'),
+    (0, common_1.Post)(':id/items/:itemId'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('itemId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, MenuItem_schema_1.MenuItem]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], MenuController.prototype, "addMenuItem", null);
 __decorate([
@@ -53,6 +55,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], MenuController.prototype, "addMenu", null);
+__decorate([
+    (0, common_1.Post)(':id/items'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], MenuController.prototype, "createMenuItem", null);
 exports.MenuController = MenuController = __decorate([
     (0, common_1.Controller)('menu'),
     __metadata("design:paramtypes", [menu_service_1.MenuService])
