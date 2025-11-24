@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Mail, Lock, ChefHat } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-
 const Login = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -12,6 +11,8 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+    const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,20 +29,22 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Login failed");
+        //alert(data.message || "Login failed");
+        setErrorMessage(data.message || "Registration failed");
         return;
       }
 
       // Save JWT token (localStorage or cookie)
       localStorage.setItem("token", data.token);
 
-      alert("Login successful!");
+      //alert("Login successful!");
 
       // Redirect user
       window.location.href = "/home";
     } catch (error) {
       console.error(error);
-      alert("Something went wrong");
+      setErrorMessage("Server error. Please try again later.");
+      //alert("Something went wrong");
     }
   };
 
@@ -114,7 +117,11 @@ const Login = () => {
                 Forgot password?
               </button>
             </div>
-
+            {errorMessage && (
+              <p className="text-red-600 text-sm mb-4 text-center">
+                {errorMessage}
+              </p>
+            )}
             {/* Login Button */}
             <button
               type="submit"

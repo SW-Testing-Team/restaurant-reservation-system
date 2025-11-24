@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ChefHat, Mail, Lock, User, Phone } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 function Register() {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,11 +19,16 @@ function Register() {
     });
   };
 
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      //alert("Passwords do not match!");
+      setErrorMessage("Passwords do not match");
       return;
     }
 
@@ -44,7 +49,8 @@ function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Registration failed");
+        //alert(data.message || "Registration failed");
+        setErrorMessage(data.message || "Registration failed");
         return;
       }
 
@@ -53,7 +59,8 @@ function Register() {
 
     } catch (error) {
       console.error(error);
-      alert("Something went wrong");
+      //alert("Something went wrong");
+      setErrorMessage("Server error. Please try again later.");
     }
   };
 
@@ -159,6 +166,11 @@ function Register() {
               </div>
             </div>
 
+            {errorMessage && (
+              <p className="text-red-600 text-sm mb-4 text-center">
+                {errorMessage}
+              </p>
+            )}
             <button
               type="submit"
               className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
