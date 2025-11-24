@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ChefHat, Mail, Lock, User, Phone } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Register() {
   const [formData, setFormData] = useState({
     name: "",
@@ -17,7 +19,7 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -25,11 +27,37 @@ function Register() {
       return;
     }
 
-    console.log("Register:", formData);
-    alert("Registration successful!");
-    // Navigate to home page
-    window.location.href = "/";
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Registration failed");
+        return;
+      }
+
+      alert("Registration successful!");
+      window.location.href = "/home";
+
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4">
@@ -85,13 +113,12 @@ function Register() {
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
-                  type="email"
-                  name="email"
+                  type="text"
+                  name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   placeholder="+201xxxxxxxxx"
-                  required
                 />
               </div>
             </div>

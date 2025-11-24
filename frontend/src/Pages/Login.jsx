@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Mail, Lock, ChefHat } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
@@ -10,13 +13,38 @@ const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Login submitted:", formData, "Remember me:", rememberMe);
 
-    // TODO: Call your API or authentication logic here
-    alert(`Logging in with email: ${formData.email}`);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Login failed");
+        return;
+      }
+
+      // Save JWT token (localStorage or cookie)
+      localStorage.setItem("token", data.token);
+
+      alert("Login successful!");
+
+      // Redirect user
+      window.location.href = "/home";
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4">
