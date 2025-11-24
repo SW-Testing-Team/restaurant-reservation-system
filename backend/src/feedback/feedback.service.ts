@@ -102,8 +102,11 @@ async getRestaurantFeedbackCount(): Promise<number> {
         }))
       );
   }
+
+
+  
   //get all feedbacks with and without replies for a display all feedbacks button
-  async getFeedbackWithReplies() {
+  async getRestaurantFeedbackWithReplies() {
     return this.restaurantFeedback
       .find({}, { rating: 1, message: 1, date: 1, reply: 1, replyDate: 1, adminId: 1 }) // fetch all feedbacks
       .populate('userId', 'username profilePicture') // get user info
@@ -231,7 +234,7 @@ async createItemFeedback(
   }
   
 
-
+ //get the newest 5 item feedbacks
   async getRecentItemFeedbacks(menuItemId?: string) {
     const filter = menuItemId ? { menuItemId } : {};
   
@@ -255,6 +258,7 @@ async createItemFeedback(
   }
   
 
+  //get all feedbacks with and without replies for a display all feedbacks button
   async getItemFeedbackWithReplies(menuItemId?: string) {
     const filter = menuItemId ? { menuItemId } : {};
   
@@ -304,4 +308,18 @@ async createItemFeedback(
   }
   
 
+  async deleteRestaurantFeedback(feedbackId: string): Promise<boolean> {
+    const result = await this.restaurantFeedback.findByIdAndDelete(feedbackId);
+    return !!result;
+  }
+  
+  async deleteItemFeedback(feedbackId: string): Promise<boolean> {
+    const result = await this.itemFeedback.findByIdAndDelete(feedbackId);
+    return !!result;
+  }
+  
+  
+  
+
 }
+
