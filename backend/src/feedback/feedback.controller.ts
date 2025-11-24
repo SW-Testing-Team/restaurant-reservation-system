@@ -1,13 +1,14 @@
-import { Controller, Get, Post, Body, Param,Patch, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get,Delete, Post, Body, Param,Patch, Query, Req, UseGuards,NotFoundException } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
-//import { JwtAuthGuard } from '../auth/jwt-auth.guard'; //waiting for the auth jwt to be implemented
-
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';   // for authentication
+import { RolesGuard } from '../auth/guards/roles.guard';        // for role-based access control
+import { Roles } from '../auth/decorators/roles.decorator';   // to specify roles on routes
 @Controller('feedback')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
-  @Post('restaurant')
-  @UseGuards(AuthGuard) // your JWT/auth guard
+  @Post('addRestaurantFeedback')
+  @UseGuards(JwtAuthGuard) // your JWT/auth guard 'must be authenticated user'
   async createRestaurantFeedback(
     @Body('message') message: string,
     @Body('rating') rating: number,
@@ -20,7 +21,7 @@ export class FeedbackController {
   
 
 
-@Get('restaurant')
+@Get('restaurantFeedback')
 //@UseGuards(AuthGuard) // optional: if only logged-in users can view
 async getAllRestaurantFeedbacks() {
   return this.feedbackService.getAllRestaurantFeedbacks();
@@ -29,7 +30,8 @@ async getAllRestaurantFeedbacks() {
 
 
 @Patch('restaurant/:feedbackId/reply')
-@UseGuards(AdminGuard) // ensure only admins can reply
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin') // ensure only admins can reply
 async replyRestaurantFeedback(
   @Param('feedbackId') feedbackId: string,
   @Body('reply') replyMessage: string,
@@ -51,28 +53,28 @@ async getRestaurantAverageRating() {
 }
 
 
-@Get('restaurant/count')
+@Get('restaurantFeedbacks/count')
 async getRestaurantFeedbackCount() {
   return this.feedbackService.getRestaurantFeedbackCount();
 }
 
 
 
-@Get('restaurant/recent')
+@Get('restaurantFeedbacks/recent')
 async getRecentRestaurantFeedbacks() {
   return this.feedbackService.getRecentRestaurantFeedbacks();
 }
 
 
 
-@Get('restaurant/all-feedbacks')
-async getFeedbackWithReplies() {
-  return this.feedbackService.getFeedbackWithReplies();
+@Get('restaurantFeedbacks/all-feedbacks')
+async getRestaurantFeedbackWithReplies() {
+  return this.feedbackService.getRestaurantFeedbackWithReplies();
 }
 
 
-@Post('item/:menuItemId')
-@UseGuards(AuthGuard) // only logged-in users
+@Post('addItemFeedback/:menuItemId')
+@UseGuards(JwtAuthGuard) // only logged-in users
 async createItemFeedback(
   @Param('menuItemId') menuItemId: string, // current item being reviewed
   @Body('message') message: string,
@@ -91,7 +93,7 @@ async createItemFeedback(
 
 
 
-@Get('item/all')
+@Get('itemFeedbacks/all')
 async getAllItemFeedbacks() {
   return this.feedbackService.getAllItemFeedbacks();
 }
@@ -99,7 +101,8 @@ async getAllItemFeedbacks() {
 
 
 @Patch('item/:id/reply')
-@UseGuards(AdminGuard) // only admins can reply
+@UseGuards(JwtAuthGuard,RolesGuard)
+@Roles('admin') // only admins can reply
 async replyItemFeedback(
   @Param('id') id: string,           // the _id of the item feedback document
   @Body('reply') replyMessage: string,
@@ -116,26 +119,26 @@ async replyItemFeedback(
 
 
 
-@Get('item/:menuItemId/average-rating')
+@Get('itemFeedback/:menuItemId/average-rating')
 async getItemAverageRating(@Param('menuItemId') menuItemId: string) {
   return this.feedbackService.getItemAverageRating(menuItemId);
 }
 
 @Get('item/count')
-async getItemFeedbackCount(@Query('menuItemId') menuItemId?: string) {
+async getItemFeedbackCount(@Query('menuItemId') menuItemId: string) {
   return this.feedbackService.getItemFeedbackCount(menuItemId);
 }
 
 
 
-@Get('item/recent')
+@Get('itemFeedbacks/recent')
 async getRecentItemFeedbacks(@Query('menuItemId') menuItemId?: string) {
   return this.feedbackService.getRecentItemFeedbacks(menuItemId);
 }
 
 
 
-@Get('item/with-replies')
+@Get('itemFeedbacks/with-replies')
 async getItemFeedbackWithReplies(@Query('menuItemId') menuItemId?: string) {
   return this.feedbackService.getItemFeedbackWithReplies(menuItemId);
 }
@@ -148,5 +151,31 @@ async getTopRatedMenuItems(@Query('limit') limit?: number) {
   return this.feedbackService.getTopRatedMenuItems(topLimit);
 }
 
+
+
+@Delete('restaurant/:id')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin') // ensure only admins can reply
+async deleteRestaurantFeedback(@Param('id') feedbackId: string) {
+  const deleted = await this.feedbackService.deleteRestaurantFeedback(feedbackId);
+  if (!deleted) {
+    throw new NotFoundException('Restaurant feedback not found');
   }
+  return { message: 'Restaurant feedback deleted successfully' };
+}
+
+@Delete('item/:id')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin') // ensure only admins can reply
+async deleteItemFeedback(@Param('id') feedbackId: string) {
+  const deleted = await this.feedbackService.deleteItemFeedback(feedbackId);
+  if (!deleted) {
+    throw new NotFoundException('Item feedback not found');
+  }
+  return { message: 'Item feedback deleted successfully' };
+}
+
+
+  }
+
 

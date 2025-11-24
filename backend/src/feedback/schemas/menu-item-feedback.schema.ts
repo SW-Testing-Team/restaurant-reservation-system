@@ -1,14 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document,Types } from 'mongoose';
 
 export type ItemFeedbackDocument = ItemFeedback & Document;
 
 @Schema()
 export class ItemFeedback {
 
-  
-  @Prop({ required: true })
-  userId: string;
+    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId: Types.ObjectId; // <-- reference to User
 
   
 
@@ -28,8 +27,10 @@ export class ItemFeedback {
   replyDate?: Date;
 
 
-  @Prop({ type: String, ref: 'User', default: null })
-  adminId?: string;// track which admin replied
+ 
+  @Prop({ type: Types.ObjectId, ref: 'User', default: null })
+  adminId?: Types.ObjectId; // stores the admin user who replied
+
 
   @Prop({
     required: true,
@@ -41,3 +42,4 @@ export class ItemFeedback {
 
 export const ItemFeedbackSchema =
   SchemaFactory.createForClass(ItemFeedback);
+

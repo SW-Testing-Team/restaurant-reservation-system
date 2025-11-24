@@ -102,9 +102,6 @@ async getRestaurantFeedbackCount(): Promise<number> {
         }))
       );
   }
-
-
-  
   //get all feedbacks with and without replies for a display all feedbacks button
   async getRestaurantFeedbackWithReplies() {
     return this.restaurantFeedback
