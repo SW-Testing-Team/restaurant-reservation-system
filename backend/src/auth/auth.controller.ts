@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Req, HttpCode, HttpStatus, Res, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -6,40 +6,93 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { CurrentUser } from './decorators/user.decorator';
+import type { Request, Response } from 'express';
+
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterDto) {
-    return {
-      success: true,
-      message: 'User registered successfully',
-      data: await this.authService.register(dto),
-    };
+  async register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    // return {
+    //   success: true,
+    //   message: 'User registered successfully',
+    //   data: await this.authService.register(dto),
+    // };
+    const { user, token } = await this.authService.register(dto);
+
+    // SET COOKIE HERE
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // localhost only
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { message: 'Registration successful', data: user };
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() dto: LoginDto) {
-    return {
-      success: true,
-      message: 'Login successful',
-      data: await this.authService.login(dto.email, dto.password),
-    };
+  async login(
+    @Body('email') email: string,
+    @Body('password') password: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    // const result = await this.authService.login(dto.email, dto.password);
+
+    // res.cookie('token', result.token, {
+    //   httpOnly: true,
+    //   secure: true,        // true in production
+    //   sameSite: 'none',    // if frontend is on different domain
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    // });
+    // return {
+    //   success: true,
+    //   message: 'Login successful',
+    //   data: await this.authService.login(dto.email, dto.password),
+    // };
+    const { user, token } = await this.authService.login(email, password);
+
+    // SET COOKIE HERE
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { message: 'Login successful', data: user };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
+  // @Get('profile')
+  // async profile(@Req() req: any) {
+  //   return { success: true, data: await this.authService.getProfile(req.user.id) };
+  // }
+
   @Get('profile')
+  @UseGuards(JwtAuthGuard)
   async profile(@Req() req: any) {
-    return { success: true, data: await this.authService.getProfile(req.user.id) };
+    if (!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    const profile = await this.authService.getProfile(req.user.id);
+    return { data: profile };
   }
+
+
 
   //logout -> client-side keep endpoint for completeness (could be used to blacklist tokens)
-  @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@CurrentUser() user: any) {
+  @UseGuards(JwtAuthGuard)
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('token');
     return { success: true, message: 'Logged out successfully' };
   }
 

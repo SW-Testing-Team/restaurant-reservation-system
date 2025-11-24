@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { ChefHat, Mail, Lock, User, Phone } from "lucide-react";
+import { AuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
+
 
 function Register() {
   const API_URL = import.meta.env.VITE_API_URL;
+
+  const navigate = useNavigate();
+
+  const { setUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +42,7 @@ function Register() {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -54,8 +62,9 @@ function Register() {
         return;
       }
 
-      alert("Registration successful!");
-      window.location.href = "/home";
+      setUser(data.data); // user info
+      //alert("Registration successful!");
+      navigate("/home");;
 
     } catch (error) {
       console.error(error);

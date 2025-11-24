@@ -1,8 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Menu, X, ChefHat, Clock, MapPin, Phone } from "lucide-react";
+import { AuthContext } from "../context/authContext";
+
 
 function Homepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, loading } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    window.location.reload(); // refresh state
+  };
 
   const menuItems = [
     {
@@ -126,7 +138,7 @@ function Homepage() {
               </a>
             </div>
 
-            <div className="hidden md:flex items-center space-x-4">
+            {/* <div className="hidden md:flex items-center space-x-4">
               <a
                 href="/login"
                 className="text-gray-700 hover:text-red-600 transition font-medium"
@@ -139,7 +151,35 @@ function Homepage() {
               >
                 Sign Up
               </a>
+            </div> */}
+
+            {/* AUTH BUTTONS */}
+            <div className="hidden md:flex items-center space-x-4">
+              {!loading && !user ? (
+                <>
+                  <a href="/login" className="text-gray-700 hover:text-red-600 transition font-medium">
+                    Login
+                  </a>
+                  <a href="/register" className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition">
+                    Sign Up
+                  </a>
+                </>
+              ) : (
+                <>
+                  <a href="/profile"
+                    className="text-gray-700 hover:text-red-600 transition font-medium">
+                    {"Profile"}
+                  </a>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-gray-200 px-6 py-2 rounded-full hover:bg-gray-300 transition"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
+
 
             {/* Mobile menu button */}
             <button
@@ -156,7 +196,7 @@ function Homepage() {
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
+        {/* {isMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 pt-2 pb-4 space-y-2">
               <a
@@ -195,6 +235,40 @@ function Homepage() {
               >
                 Sign Up
               </a>
+            </div>
+          </div>
+        )} */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="px-4 pt-2 pb-4 space-y-2">
+              <a href="#home" className="block py-2 text-gray-700 hover:text-red-600">Home</a>
+              <a href="#menu" className="block py-2 text-gray-700 hover:text-red-600">Menu</a>
+              <a href="#about" className="block py-2 text-gray-700 hover:text-red-600">About</a>
+              <a href="#contact" className="block py-2 text-gray-700 hover:text-red-600">Contact</a>
+
+              {!loading && !user ? (
+                <>
+                  <a href="/login" className="block py-2 text-gray-700 hover:text-red-600">Login</a>
+                  <a
+                    href="/register"
+                    className="block bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition mt-2 text-center"
+                  >
+                    Sign Up
+                  </a>
+                </>
+              ) : (
+                <>
+                  <a href="/profile" className="block py-2 text-gray-700 hover:text-red-600">
+                    {user?.name || "Profile"}
+                  </a>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full bg-gray-200 py-2 rounded-full mt-2 hover:bg-gray-300 transition"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}

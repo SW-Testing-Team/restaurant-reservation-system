@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Mail, Lock, ChefHat } from "lucide-react";
+import { AuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
+
 
 const Login = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,10 +27,14 @@ const Login = () => {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
       const data = await response.json();
@@ -39,8 +50,9 @@ const Login = () => {
 
       //alert("Login successful!");
 
+      setUser(data.data); // user info
       // Redirect user
-      window.location.href = "/home";
+      navigate("/home");;
     } catch (error) {
       console.error(error);
       setErrorMessage("Server error. Please try again later.");
@@ -130,6 +142,25 @@ const Login = () => {
               Login
             </button>
           </form>
+        </div>
+        {/* Bottom Buttons */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Don’t have an account?{" "}
+            <a
+              href="/register"
+              className="text-red-600 font-semibold hover:text-red-700"
+            >
+              Register
+            </a>
+          </p>
+
+          <a
+            href="/"
+            className="inline-block mt-3 text-gray-500 hover:text-gray-700"
+          >
+            ← Back to Home
+          </a>
         </div>
       </div>
     </div>
