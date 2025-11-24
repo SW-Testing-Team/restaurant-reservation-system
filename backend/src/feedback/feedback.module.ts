@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FeedbackController } from './feedback.controller';
 import { FeedbackService } from './feedback.service';
-import { ItemFeedback, ItemFeedbackSchema } from './schemas/item-feedback.schema';
+import { ItemFeedback, ItemFeedbackSchema } from './schemas/menu-item-feedback.schema';
 import { RestaurantFeedback, RestaurantFeedbackSchema } from './schemas/restaurant-feedback.schema';
 
 @Module({
