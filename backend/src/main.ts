@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';//to be able to create DTO   " npm install class-validator class-transformer"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
