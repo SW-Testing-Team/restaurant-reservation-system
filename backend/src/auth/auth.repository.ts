@@ -21,7 +21,6 @@ export class AuthRepository {
     return this.userModel.find().sort({ id: 1 }).lean();
   }
 
-
   async create(userData: Partial<User>) {
     const created = new this.userModel(userData);
     return created.save();
