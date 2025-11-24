@@ -235,9 +235,11 @@ function Homepage() {
           <p className="text-xl md:text-2xl mb-8">
             Experience authentic Italian cuisine
           </p>
-          <button className="bg-white text-red-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
-            View Menu
-          </button>
+          <a href="#menu">
+            <button className="bg-white text-red-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
+              View Menu
+            </button>
+          </a>
         </div>
       </section>
 
@@ -292,7 +294,7 @@ function Homepage() {
                             {item.name}
                           </h4>
                           <span className="text-red-600 font-bold">
-                            {item.price}
+                            {item.price}$
                           </span>
                         </div>
                         <p className="text-gray-600 text-sm">{item.desc}</p>
