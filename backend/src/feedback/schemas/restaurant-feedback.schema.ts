@@ -17,7 +17,7 @@ export class RestaurantFeedback {
   @Prop({ default: () => new Date() })
   date: Date;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', default: null })
+  @Prop({ type: Types.ObjectId, ref: 'Admin', default: null })
   adminId?: Types.ObjectId; // stores the admin user who replied
 
   

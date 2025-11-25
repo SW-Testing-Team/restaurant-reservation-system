@@ -1,6 +1,19 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2"
+=======
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/jwt": "^11.0.1",
+    "@nestjs/mongoose": "^11.0.3",
+    "@nestjs/passport": "^11.0.5",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "mongoose": "^8.20.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1"
+>>>>>>> e0e59574e334ab35b4ec9213ed98db9368d3d860
   }
 }

@@ -6,7 +6,7 @@ export type ItemFeedbackDocument = ItemFeedback & Document;
 @Schema()
 export class ItemFeedback {
 
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: Types.ObjectId, ref: 'user', required: true })
   userId: Types.ObjectId; // <-- reference to User
 
   
