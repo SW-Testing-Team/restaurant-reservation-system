@@ -17,8 +17,8 @@ export class Reservation {
   @Prop({ required: true })
   time: string;  // format: HH:mm
 
-  @Prop({ required: false,
-  match: /^01[0-2,5]{1}[0-9]{8}$/, // Egyptian phone number pattern
+  @Prop({
+  match: /^01[0-2,5]{1}[0-9]{8}$/ // Egyptian phone number pattern
 })
 phoneNumber: string;
 
