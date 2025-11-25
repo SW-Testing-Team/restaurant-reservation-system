@@ -2,8 +2,6 @@ import { useState, useEffect, useContext } from "react";
 import { Menu, X, ChefHat, Clock, MapPin, Phone } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 
-import { useState, useEffect } from "react";
-import { Menu, X, ChefHat, Clock, MapPin, Phone } from "lucide-react";
 import axios from "axios";
 
 function Homepage() {
@@ -101,7 +99,6 @@ function Homepage() {
   // ];
 
   const [menu, setMenu] = useState([]); // state to hold menu data
-  const [loading, setLoading] = useState(true); // state for loading
   const [error, setError] = useState(null); // state for errors
 
   useEffect(() => {
