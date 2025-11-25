@@ -5,6 +5,8 @@ import { RestaurantFeedback, RestaurantFeedbackDocument } from './schemas/restau
 import { ItemFeedback, ItemFeedbackDocument } from './schemas/menu-item-feedback.schema';
 import { populatedUser } from './interfaces/populatedUser';
 import { populatedAdmin } from './interfaces/populatedAdmin';
+import mongoose from 'mongoose';
+
 
 @Injectable()
 export class FeedbackService {
@@ -186,6 +188,7 @@ async createItemFeedback(
       .find(filter)
       .populate('userId', 'username profilePicture')   // user fields
       .populate('adminId', 'username profilePicture')  // admin fields
+      .populate('menuItemId', '_id')                   // include menuItemId only
       .sort({ date: -1 })
       .lean()
       .exec()
@@ -203,7 +206,7 @@ async createItemFeedback(
             replyMessage: fb.reply || null,
             replyDate: fb.replyDate || null,
             adminName: admin ? admin.name : null,
-           
+            menuItemId: fb.menuItemId?._id || null, // include menu item ID
           };
         })
       );
@@ -256,14 +259,16 @@ async createItemFeedback(
 
 
   async getItemFeedbackCount(menuItemId?: string): Promise<number> {
-    const filter = menuItemId ? { menuItemId } : {}; // filter by menu item if provided
+    const filter = menuItemId ? { menuItemId: new mongoose.Types.ObjectId(menuItemId) } : {}; // filter by menu item if provided
     return this.itemFeedback.countDocuments(filter).exec();
   }
   
 
  //get the newest 5 item feedbacks
-  async getRecentItemFeedbacks(menuItemId?: string) {
-  const filter = menuItemId ? { menuItemId } : {};
+async getRecentItemFeedbacks(menuItemId?: string) {
+  const filter = menuItemId
+    ? { menuItemId: new mongoose.Types.ObjectId(menuItemId) }
+    : {};
 
   return this.itemFeedback
     .find(filter, { rating: 1, message: 1, date: 1, menuItemId: 1 })
@@ -281,42 +286,46 @@ async createItemFeedback(
           rating: fb.rating,
           message: fb.message,
           date: fb.date,
+          menuItemId: fb.menuItemId?._id || null, // include menu item ID
         };
       })
     );
 }
-
   
+
 
   //get all feedbacks with and without replies for a display all feedbacks button
-  async getItemFeedbackWithReplies(menuItemId?: string) {
-    const filter = menuItemId ? { menuItemId } : {};
-  
-    return this.itemFeedback
-      .find(filter, { rating: 1, message: 1, date: 1, reply: 1, replyDate: 1, adminId: 1, menuItemId: 1 })
-      .populate('userId', 'username profilePicture')   // user info
-      .populate('adminId', 'username profilePicture')  // admin info if replied
-      .sort({ date: -1 }) // newest first
-      .lean()
-      .exec()
-      .then(feedbacks =>
-        feedbacks.map(fb => {
-          // Cast populated fields
-          const user = fb.userId as unknown as populatedUser;
-          const admin = fb.adminId as unknown as populatedAdmin | null;
-  
-          return {
-            username: user.name,
-            rating: fb.rating,
-            message: fb.message,
-            date: fb.date,
-            replyMessage: fb.reply || null,
-            replyDate: fb.replyDate || null,
-            adminName: admin ? admin.name : null,
-          };
-        })
-      );
-  }
+async getItemFeedbackWithReplies(menuItemId?: string) {
+  const filter = menuItemId
+    ? { menuItemId: new mongoose.Types.ObjectId(menuItemId) }
+    : {};
+
+  return this.itemFeedback
+    .find(filter, { rating: 1, message: 1, date: 1, reply: 1, replyDate: 1, adminId: 1, menuItemId: 1 })
+    .populate('userId', 'username profilePicture')   // user info
+    .populate('adminId', 'username profilePicture')  // admin info if replied
+    .sort({ date: -1 }) // newest first
+    .lean()
+    .exec()
+    .then(feedbacks =>
+      feedbacks.map(fb => {
+        // Cast populated fields
+        const user = fb.userId as unknown as populatedUser;
+        const admin = fb.adminId as unknown as populatedAdmin | null;
+
+        return {
+          username: user.name,
+          rating: fb.rating,
+          message: fb.message,
+          date: fb.date,
+          replyMessage: fb.reply || null,
+          replyDate: fb.replyDate || null,
+          adminName: admin ? admin.name : null,
+          menuItemId: fb.menuItemId?._id || null, // include menu item ID
+        };
+      })
+    );
+}
   
 
   //returns top rated items (item id, avg rating, total reviews)

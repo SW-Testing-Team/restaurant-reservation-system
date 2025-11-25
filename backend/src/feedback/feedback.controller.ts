@@ -94,9 +94,10 @@ async createItemFeedback(
 
 
 @Get('itemFeedbacks/all')
-async getAllItemFeedbacks() {
-  return this.feedbackService.getAllItemFeedbacks();
+async getAllItemFeedbacks(@Query('menuItemId') menuItemId?: string) {
+  return this.feedbackService.getAllItemFeedbacks(menuItemId);
 }
+
 
 
 

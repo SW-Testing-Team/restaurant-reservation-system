@@ -10,6 +10,8 @@ export class ItemFeedback {
   userId: Types.ObjectId; // <-- reference to User
 
   
+  @Prop({ type: Types.ObjectId, ref: 'MenuItem', required: true })
+  menuItemId: Types.ObjectId; // reference to MenuItem
 
   @Prop({ required: true })
   message: string;
