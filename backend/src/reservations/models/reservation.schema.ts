@@ -26,11 +26,7 @@ phoneNumber: string;
   @Prop({ required: true })
   guests: number;
 
-  @Prop({
-    default: 'confirmed',
-    enum: ['confirmed', 'cancelled'],
-  })
-  status: string;
+
 }
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);
