@@ -28,7 +28,7 @@ async getAllRestaurantFeedbacks() {
 }
 
 
-
+//requires an admin user so cant test
 @Patch('restaurant/:feedbackId/reply')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin') // ensure only admins can reply
@@ -67,21 +67,26 @@ async getRecentRestaurantFeedbacks() {
 
 
 
-@Get('restaurantFeedbacks/all-feedbacks')
-async getRestaurantFeedbackWithReplies() {
-  return this.feedbackService.getRestaurantFeedbackWithReplies();
+@Get('restaurantFeedbacks/sorted-feedbacks')
+async getRestaurantFeedbackSorted() {
+  return this.feedbackService.getRestaurantFeedbackSorted();
 }
 
 
 @Post('addItemFeedback/:menuItemId')
-@UseGuards(JwtAuthGuard) // only logged-in users
+@UseGuards(JwtAuthGuard)
 async createItemFeedback(
-  @Param('menuItemId') menuItemId: string, // current item being reviewed
+  @Param('menuItemId') menuItemId: string,
   @Body('message') message: string,
   @Body('rating') rating: number,
   @Req() req,
 ) {
-  const userId = req.user.id; // logged-in user's ID
+  const userId = req.user.id;
+
+  // Remove any accidental colon
+  if (menuItemId.startsWith(':')) {
+    menuItemId = menuItemId.slice(1);
+  }
 
   return this.feedbackService.createItemFeedback(
     userId,
@@ -93,10 +98,14 @@ async createItemFeedback(
 
 
 
-@Get('itemFeedbacks/all')
-async getAllItemFeedbacks(@Query('menuItemId') menuItemId?: string) {
-  return this.feedbackService.getAllItemFeedbacks(menuItemId);
+// Get all feedbacks for a specific menu item
+@Get('itemFeedbacks/:menuItemId')
+async getItemFeedbacksByMenuItem(
+  @Param('menuItemId') menuItemId: string,
+) {
+  return this.feedbackService.getItemFeedbacksByMenuItem(menuItemId);
 }
+
 
 
 
@@ -125,24 +134,23 @@ async getItemAverageRating(@Param('menuItemId') menuItemId: string) {
   return this.feedbackService.getItemAverageRating(menuItemId);
 }
 
-@Get('item/count')
-async getItemFeedbackCount(@Query('menuItemId') menuItemId: string) {
+
+@Get('item/:menuItemId/count')
+async getItemFeedbackCount(@Param('menuItemId') menuItemId: string) {
   return this.feedbackService.getItemFeedbackCount(menuItemId);
 }
 
 
 
-@Get('itemFeedbacks/recent')
-async getRecentItemFeedbacks(@Query('menuItemId') menuItemId?: string) {
+
+@Get('itemFeedbacks/:menuItemId/recent')
+async getRecentItemFeedbacks(@Param('menuItemId') menuItemId: string) {
   return this.feedbackService.getRecentItemFeedbacks(menuItemId);
 }
 
 
 
-@Get('itemFeedbacks/with-replies')
-async getItemFeedbackWithReplies(@Query('menuItemId') menuItemId?: string) {
-  return this.feedbackService.getItemFeedbackWithReplies(menuItemId);
-}
+
 
 
 @Get('item/top-rated')
