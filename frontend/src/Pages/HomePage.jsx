@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Menu, X, ChefHat, Clock, MapPin, Phone } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 
+import axios from "axios";
 
 function Homepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,86 +17,107 @@ function Homepage() {
     window.location.reload(); // refresh state
   };
 
-  const menuItems = [
-    {
-      category: "Appetizers",
-      items: [
-        {
-          name: "Bruschetta",
-          price: "$8.99",
-          desc: "Grilled bread with tomatoes and basil",
-          image:
-            "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop",
-        },
-        {
-          name: "Calamari",
-          price: "$12.99",
-          desc: "Crispy fried squid with marinara",
-          image:
-            "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&fit=crop",
-        },
-        {
-          name: "Caesar Salad",
-          price: "$9.99",
-          desc: "Romaine lettuce with classic dressing",
-          image:
-            "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop",
-        },
-      ],
-    },
-    {
-      category: "Main Courses",
-      items: [
-        {
-          name: "Grilled Salmon",
-          price: "$24.99",
-          desc: "Fresh Atlantic salmon with herbs",
-          image:
-            "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
-        },
-        {
-          name: "Ribeye Steak",
-          price: "$32.99",
-          desc: "12oz prime beef with vegetables",
-          image:
-            "https://images.unsplash.com/photo-1558030006-450675393462?w=400&h=300&fit=crop",
-        },
-        {
-          name: "Pasta Carbonara",
-          price: "$18.99",
-          desc: "Creamy pasta with bacon and egg",
-          image:
-            "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop",
-        },
-      ],
-    },
-    {
-      category: "Desserts",
-      items: [
-        {
-          name: "Tiramisu",
-          price: "$7.99",
-          desc: "Classic Italian dessert",
-          image:
-            "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop",
-        },
-        {
-          name: "Chocolate Lava Cake",
-          price: "$8.99",
-          desc: "Warm cake with molten center",
-          image:
-            "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop",
-        },
-        {
-          name: "Panna Cotta",
-          price: "$6.99",
-          desc: "Vanilla cream with berry sauce",
-          image:
-            "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop",
-        },
-      ],
-    },
-  ];
+  // const menuItems = [
+  //   {
+  //     category: "Appetizers",
+  //     items: [
+  //       {
+  //         name: "Bruschetta",
+  //         price: "$8.99",
+  //         desc: "Grilled bread with tomatoes and basil",
+  //         image:
+  //           "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop",
+  //       },
+  //       {
+  //         name: "Calamari",
+  //         price: "$12.99",
+  //         desc: "Crispy fried squid with marinara",
+  //         image:
+  //           "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&fit=crop",
+  //       },
+  //       {
+  //         name: "Caesar Salad",
+  //         price: "$9.99",
+  //         desc: "Romaine lettuce with classic dressing",
+  //         image:
+  //           "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     category: "Main Courses",
+  //     items: [
+  //       {
+  //         name: "Grilled Salmon",
+  //         price: "$24.99",
+  //         desc: "Fresh Atlantic salmon with herbs",
+  //         image:
+  //           "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
+  //       },
+  //       {
+  //         name: "Ribeye Steak",
+  //         price: "$32.99",
+  //         desc: "12oz prime beef with vegetables",
+  //         image:
+  //           "https://images.unsplash.com/photo-1558030006-450675393462?w=400&h=300&fit=crop",
+  //       },
+  //       {
+  //         name: "Pasta Carbonara",
+  //         price: "$18.99",
+  //         desc: "Creamy pasta with bacon and egg",
+  //         image:
+  //           "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     category: "Desserts",
+  //     items: [
+  //       {
+  //         name: "Tiramisu",
+  //         price: "$7.99",
+  //         desc: "Classic Italian dessert",
+  //         image:
+  //           "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop",
+  //       },
+  //       {
+  //         name: "Chocolate Lava Cake",
+  //         price: "$8.99",
+  //         desc: "Warm cake with molten center",
+  //         image:
+  //           "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop",
+  //       },
+  //       {
+  //         name: "Panna Cotta",
+  //         price: "$6.99",
+  //         desc: "Vanilla cream with berry sauce",
+  //         image:
+  //           "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop",
+  //       },
+  //     ],
+  //   },
+  // ];
+
+  const [menu, setMenu] = useState([]); // state to hold menu data
+  const [error, setError] = useState(null); // state for errors
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/menu");
+        setMenu(response.data); // store menu in state
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, []); // empty dependency array → runs once on mount
+
+  if (loading) return <p>Loading menu...</p>;
+  if (error) return <p>Error fetching menu: {error.message}</p>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -157,17 +179,25 @@ function Homepage() {
             <div className="hidden md:flex items-center space-x-4">
               {!loading && !user ? (
                 <>
-                  <a href="/login" className="text-gray-700 hover:text-red-600 transition font-medium">
+                  <a
+                    href="/login"
+                    className="text-gray-700 hover:text-red-600 transition font-medium"
+                  >
                     Login
                   </a>
-                  <a href="/register" className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition">
+                  <a
+                    href="/register"
+                    className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition"
+                  >
                     Sign Up
                   </a>
                 </>
               ) : (
                 <>
-                  <a href="/profile"
-                    className="text-gray-700 hover:text-red-600 transition font-medium">
+                  <a
+                    href="/profile"
+                    className="text-gray-700 hover:text-red-600 transition font-medium"
+                  >
                     {"Profile"}
                   </a>
                   <button
@@ -179,7 +209,6 @@ function Homepage() {
                 </>
               )}
             </div>
-
 
             {/* Mobile menu button */}
             <button
@@ -241,14 +270,39 @@ function Homepage() {
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 pt-2 pb-4 space-y-2">
-              <a href="#home" className="block py-2 text-gray-700 hover:text-red-600">Home</a>
-              <a href="#menu" className="block py-2 text-gray-700 hover:text-red-600">Menu</a>
-              <a href="#about" className="block py-2 text-gray-700 hover:text-red-600">About</a>
-              <a href="#contact" className="block py-2 text-gray-700 hover:text-red-600">Contact</a>
+              <a
+                href="#home"
+                className="block py-2 text-gray-700 hover:text-red-600"
+              >
+                Home
+              </a>
+              <a
+                href="#menu"
+                className="block py-2 text-gray-700 hover:text-red-600"
+              >
+                Menu
+              </a>
+              <a
+                href="#about"
+                className="block py-2 text-gray-700 hover:text-red-600"
+              >
+                About
+              </a>
+              <a
+                href="#contact"
+                className="block py-2 text-gray-700 hover:text-red-600"
+              >
+                Contact
+              </a>
 
               {!loading && !user ? (
                 <>
-                  <a href="/login" className="block py-2 text-gray-700 hover:text-red-600">Login</a>
+                  <a
+                    href="/login"
+                    className="block py-2 text-gray-700 hover:text-red-600"
+                  >
+                    Login
+                  </a>
                   <a
                     href="/register"
                     className="block bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition mt-2 text-center"
@@ -258,7 +312,10 @@ function Homepage() {
                 </>
               ) : (
                 <>
-                  <a href="/profile" className="block py-2 text-gray-700 hover:text-red-600">
+                  <a
+                    href="/profile"
+                    className="block py-2 text-gray-700 hover:text-red-600"
+                  >
                     {user?.name || "Profile"}
                   </a>
                   <button
@@ -286,9 +343,11 @@ function Homepage() {
           <p className="text-xl md:text-2xl mb-8">
             Experience authentic Italian cuisine
           </p>
-          <button className="bg-white text-red-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
-            View Menu
-          </button>
+          <a href="#menu">
+            <button className="bg-white text-red-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
+              View Menu
+            </button>
+          </a>
         </div>
       </section>
 
@@ -321,10 +380,10 @@ function Homepage() {
           <h2 className="text-4xl font-bold text-center mb-12">Our Menu</h2>
 
           <div className="space-y-12">
-            {menuItems.map((section, idx) => (
+            {menu.map((section, idx) => (
               <div key={idx}>
                 <h3 className="text-2xl font-bold text-red-600 mb-6 border-b-2 border-red-600 pb-2">
-                  {section.category}
+                  {section.title}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {section.items.map((item, itemIdx) => (
@@ -333,7 +392,7 @@ function Homepage() {
                       className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
                     >
                       <img
-                        src={item.image}
+                        src={item.imageUrl}
                         alt={item.name}
                         className="w-full h-48 object-cover"
                       />
@@ -343,7 +402,7 @@ function Homepage() {
                             {item.name}
                           </h4>
                           <span className="text-red-600 font-bold">
-                            {item.price}
+                            {item.price}$
                           </span>
                         </div>
                         <p className="text-gray-600 text-sm">{item.desc}</p>
