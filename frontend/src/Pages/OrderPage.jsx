@@ -9,7 +9,7 @@ function OrderPage() {
   const [orderType, setOrderType] = useState("dine-in");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, setUser } = useContext(AuthContext);
 
   const [menu, setMenu] = useState([]);
   const [error, setError] = useState(null);
@@ -24,6 +24,7 @@ function OrderPage() {
         setError(err);
       } finally {
         setMenuLoading(false);
+        console.log("userdata:", user);
       }
     };
 
