@@ -73,6 +73,15 @@ export class ReservationController {
     const userId = req.user.role === 'admin' ? undefined : req.user.id;
     return this.reservationService.update(id, dto, userId);
   }
+  
+  @Get('available-for-update/:reservationId')
+async getAvailableTablesForUpdate(
+  @Query('date') date: string,
+  @Query('time') time: string,
+  @Param('reservationId') reservationId: string
+) {
+  return this.reservationService.getAvailableTablesForUpdate(date, time, reservationId);
+}
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

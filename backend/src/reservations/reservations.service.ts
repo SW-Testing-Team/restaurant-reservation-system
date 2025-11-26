@@ -93,6 +93,19 @@ async update(id: string, dto: UpdateReservationDto, userId?: string) {
 
   return this.reservationModel.findByIdAndUpdate(id, dto, { new: true });
 }
+async getAvailableTablesForUpdate(date: string, time: string, excludeReservationId: string) {
+  // Get all reservations for this date/time EXCEPT the one we're updating
+  const reserved = await this.reservationModel.find({
+    date,
+    time,
+    _id: { $ne: new Types.ObjectId(excludeReservationId) } // Exclude current reservation
+  });
+
+  const takenTables = reserved.map(r => r.tableNumber);
+  const allTables = Array.from({ length: 20 }, (_, i) => i + 1);
+  
+  return allTables.filter(t => !takenTables.includes(t));
+}
 
 async cancel(id: string, userId?: string) {
   const reservation = await this.reservationModel.findById(id);

@@ -78,6 +78,14 @@ function Homepage() {
               >
                 Contact
               </a>
+              {user && (
+  <a
+    href="/my-reservations"
+    className="text-gray-700 hover:text-red-600 transition"
+  >
+    My Reservations
+  </a>
+)}
             </div>
 
             {/* <div className="hidden md:flex items-center space-x-4">
@@ -359,16 +367,18 @@ function Homepage() {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-16 bg-gray-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Visit Us Today</h2>
-          <p className="text-xl mb-8">Experience the taste of Italy</p>
-          <button className="bg-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-red-700 transition">
-            Make a Reservation
-          </button>
-        </div>
-      </section>
+{/* Contact Section */}
+<section id="contact" className="py-16 bg-gray-800 text-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 className="text-4xl font-bold mb-6">Visit Us Today</h2>
+    <p className="text-xl mb-8">Experience the taste of Italy</p>
+    <a href="/reservations">
+      <button className="bg-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-red-700 transition">
+        Make a Reservation
+      </button>
+    </a>
+  </div>
+</section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-8">
