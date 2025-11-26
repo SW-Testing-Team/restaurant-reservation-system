@@ -29,7 +29,6 @@ function Homepage() {
       } catch (err) {
         setError(err);
       } finally {
-        setLoading(false);
       }
     };
 
