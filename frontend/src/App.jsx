@@ -7,6 +7,7 @@ import Profile from "./Pages/Profile";
 import OrderPage from "./Pages/OrderPage";
 import ReservationPage from "./Pages/ReservationPage";
 import MyReservations from "./Pages/MyReservationsPage";
+import AdminReservation from "./Pages/AdminReservation";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/reservations" element={<ReservationPage />} />
         <Route path="/my-reservations" element={<MyReservations />} />
-
+        <Route path= "/admin/reservation" element={<AdminReservation />} />
 
       </Routes>
     </>
