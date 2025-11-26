@@ -17,7 +17,6 @@ function Homepage() {
     window.location.reload(); // refresh state
   };
 
-
   const [menu, setMenu] = useState([]); // state to hold menu data
   const [error, setError] = useState(null); // state for errors
 
@@ -26,6 +25,8 @@ function Homepage() {
       try {
         const response = await axios.get("http://localhost:3000/menu");
         setMenu(response.data); // store menu in state
+
+        console.log("user data:", user);
       } catch (err) {
         setError(err);
       } finally {
