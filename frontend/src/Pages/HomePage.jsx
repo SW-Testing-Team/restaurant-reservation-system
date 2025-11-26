@@ -38,7 +38,7 @@ function Homepage() {
 
   if (loading) return <p>Loading menu...</p>;
   if (error) return <p>Error fetching menu: {error.message}</p>;
-
+  console.log("user in homepage:", user);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
