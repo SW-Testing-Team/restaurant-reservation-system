@@ -1,7 +1,16 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { ChefHat, Mail, Lock, User, Phone } from "lucide-react";
+import { AuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
+
 
 function Register() {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const navigate = useNavigate();
+
+  const { setUser } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,19 +26,54 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      //alert("Passwords do not match!");
+      setErrorMessage("Passwords do not match");
       return;
     }
 
-    console.log("Register:", formData);
-    alert("Registration successful!");
-    // Navigate to home page
-    window.location.href = "/";
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        //alert(data.message || "Registration failed");
+        setErrorMessage(data.message || "Registration failed");
+        return;
+      }
+
+      setUser(data.data); // user info
+      //alert("Registration successful!");
+      navigate("/home");;
+
+    } catch (error) {
+      console.error(error);
+      //alert("Something went wrong");
+      setErrorMessage("Server error. Please try again later.");
+    }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4">
@@ -85,13 +129,12 @@ function Register() {
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
-                  type="email"
-                  name="email"
+                  type="text"
+                  name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   placeholder="+201xxxxxxxxx"
-                  required
                 />
               </div>
             </div>
@@ -132,6 +175,11 @@ function Register() {
               </div>
             </div>
 
+            {errorMessage && (
+              <p className="text-red-600 text-sm mb-4 text-center">
+                {errorMessage}
+              </p>
+            )}
             <button
               type="submit"
               className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"

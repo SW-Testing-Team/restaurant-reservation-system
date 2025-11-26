@@ -10,19 +10,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     private readonly authRepo: AuthRepository,
   ) {
+    const secret = configService.get<string>('JWT_SECRET');
+
+    if (!secret) {
+      throw new Error('JWT_SECRET is missing in environment variables');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey:
-        configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET,
+      secretOrKey: secret, // ALWAYS defined → fixes the TS error
     });
   }
 
   async validate(payload: any) {
-    // payload.sub is the user id
     const user = await this.authRepo.findById(payload.sub);
     if (!user) return null;
-    // return what will be attached to req.user
+
     return {
       id: user._id,
       email: user.email,

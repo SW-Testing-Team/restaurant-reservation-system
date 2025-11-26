@@ -1,21 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Mail, Lock, ChefHat } from "lucide-react";
+import { AuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log("Login submitted:", formData, "Remember me:", rememberMe);
+  const [errorMessage, setErrorMessage] = useState("");
 
-    // TODO: Call your API or authentication logic here
-    alert(`Logging in with email: ${formData.email}`);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        //alert(data.message || "Login failed");
+        setErrorMessage(data.message || "Registration failed");
+        return;
+      }
+
+      // Save JWT token (localStorage or cookie)
+      localStorage.setItem("token", data.token);
+
+      //alert("Login successful!");
+
+      setUser(data.data); // user info
+      console.log(data.data);
+      // Redirect user
+      navigate("/home");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Server error. Please try again later.");
+      //alert("Something went wrong");
+    }
   };
 
   return (
@@ -86,7 +126,11 @@ const Login = () => {
                 Forgot password?
               </button>
             </div>
-
+            {errorMessage && (
+              <p className="text-red-600 text-sm mb-4 text-center">
+                {errorMessage}
+              </p>
+            )}
             {/* Login Button */}
             <button
               type="submit"
@@ -95,6 +139,25 @@ const Login = () => {
               Login
             </button>
           </form>
+        </div>
+        {/* Bottom Buttons */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Don’t have an account?{" "}
+            <a
+              href="/register"
+              className="text-red-600 font-semibold hover:text-red-700"
+            >
+              Register
+            </a>
+          </p>
+
+          <a
+            href="/"
+            className="inline-block mt-3 text-gray-500 hover:text-gray-700"
+          >
+            ← Back to Home
+          </a>
         </div>
       </div>
     </div>

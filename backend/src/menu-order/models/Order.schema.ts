@@ -6,8 +6,14 @@ export class Order extends Document {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: string; // who made the order
 
+  @Prop({ required: true, enum: ['dine-in', 'takeaway', 'delivery'] })
+  type: string;
+
+  @Prop()
+  tableNumber: number;
   @Prop([
     {
+      _id: false,
       menuItemId: { type: Types.ObjectId, ref: 'MenuItem', required: true },
       quantity: { type: Number, required: true },
     },
@@ -17,7 +23,7 @@ export class Order extends Document {
     quantity: number;
   }[];
 
-  @Prop({ required: true })
+  @Prop()
   totalPrice: number;
 
   @Prop({
