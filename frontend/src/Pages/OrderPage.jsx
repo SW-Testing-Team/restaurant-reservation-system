@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { ChefHat, Plus, Minus, Trash2, ShoppingCart, X } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingCart, X } from "lucide-react";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
+import Navbar from "../components/Navbar"; // Add this import
 
 function OrderPage() {
   const [cart, setCart] = useState([]);
@@ -108,39 +109,8 @@ function OrderPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md fixed w-full top-0 z-50 pr-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <ChefHat className="h-8 w-8 text-red-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-800">
-                Bella Vista
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <a
-                href="/"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Home
-              </a>
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="relative bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition"
-              >
-                <ShoppingCart className="h-6 w-6" />
-                {getTotalItems() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                    {getTotalItems()}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Use shared Navbar component */}
+      <Navbar currentPage="order" />
 
       {/* Order Type Selection */}
       <div className="pt-24 pb-8 bg-white">
@@ -182,6 +152,7 @@ function OrderPage() {
         </div>
       </div>
 
+      {/* Rest of the OrderPage content remains the same */}
       {/* Menu Items */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {menu.map((section, idx) => (

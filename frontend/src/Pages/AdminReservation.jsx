@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
-import { Calendar, Clock, Users, Phone, MapPin, Trash2, Edit2, Menu, X, ChefHat, Check, X as CloseIcon, User, Mail } from "lucide-react";
+import { Calendar, Clock, Users, Phone, MapPin, Trash2, Edit2, Check, X as CloseIcon, User, Mail, Search, Filter } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 const AdminReservation = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { user } = useContext(AuthContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -18,15 +18,14 @@ const AdminReservation = () => {
   });
   const [availableTables, setAvailableTables] = useState([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  
+  // Search and Filter States
+  const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all"); // all, upcoming, completed
-
-  const handleLogout = async () => {
-    await fetch(`${API_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    window.location.reload();
-  };
+  const [dateFilter, setDateFilter] = useState("");
+  const [timeFilter, setTimeFilter] = useState("");
+  const [tableFilter, setTableFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     if (user && user.role === "admin") {
@@ -179,15 +178,17 @@ const AdminReservation = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+const formatDate = (dateString) => {
+  // Create date in UTC to avoid timezone conversion
+  const date = new Date(dateString + 'T00:00:00Z'); // Force UTC time
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC' // Ensure no timezone conversion
+  });
+};
 
   const getStatusColor = (date, time) => {
     const reservationDateTime = new Date(`${date}T${time}`);
@@ -213,20 +214,56 @@ const AdminReservation = () => {
     return editFormData.date !== reservation.date || editFormData.time !== reservation.time;
   };
 
-  // Filter reservations based on selected filter
+  // Advanced Search and Filter Function
   const filteredReservations = reservations.filter(reservation => {
     const reservationDateTime = new Date(`${reservation.date}T${reservation.time}`);
     const now = new Date();
     
+    // Status filter
+    let statusMatch = true;
     switch (filter) {
       case "upcoming":
-        return reservationDateTime >= now;
+        statusMatch = reservationDateTime >= now;
+        break;
       case "completed":
-        return reservationDateTime < now;
+        statusMatch = reservationDateTime < now;
+        break;
       default:
-        return true;
+        statusMatch = true;
     }
+
+    // Search term filter (searches in reservation ID, user name, email, phone)
+    const searchLower = searchTerm.toLowerCase();
+    const searchMatch = !searchTerm || 
+      reservation._id.toLowerCase().includes(searchLower) ||
+      (reservation.userId?.name && reservation.userId.name.toLowerCase().includes(searchLower)) ||
+      (reservation.userId?.email && reservation.userId.email.toLowerCase().includes(searchLower)) ||
+      (reservation.phoneNumber && reservation.phoneNumber.includes(searchTerm)) ||
+      `reservation #${reservation._id.slice(-6).toUpperCase()}`.includes(searchLower);
+
+    // Date filter
+    const dateMatch = !dateFilter || reservation.date === dateFilter;
+
+    // Time filter
+    const timeMatch = !timeFilter || reservation.time === timeFilter;
+
+    // Table filter
+    const tableMatch = !tableFilter || reservation.tableNumber.toString() === tableFilter;
+
+    return statusMatch && searchMatch && dateMatch && timeMatch && tableMatch;
   });
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm("");
+    setDateFilter("");
+    setTimeFilter("");
+    setTableFilter("");
+    setFilter("all");
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = searchTerm || dateFilter || timeFilter || tableFilter || filter !== "all";
 
   if (loading) {
     return (
@@ -256,98 +293,9 @@ const AdminReservation = () => {
     );
   }
 
-  return (
+ return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <ChefHat className="h-8 w-8 text-red-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-800">
-                Bella Vista
-              </span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-8">
-              <a
-                href="/"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Home
-              </a>
-              <a
-                href="/admin-reservations"
-                className="text-red-600 font-semibold transition"
-              >
-                Admin Reservations
-              </a>
-              <a
-                href="/reservations"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Make Reservation
-              </a>
-            </div>
-
-            {/* Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <span className="text-gray-700">Admin: {user.name}</span>
-              <button
-                onClick={handleLogout}
-                className="bg-gray-200 px-6 py-2 rounded-full hover:bg-gray-300 transition"
-              >
-                Logout
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-gray-700"
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-4 pt-2 pb-4 space-y-2">
-              <a
-                href="/"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Home
-              </a>
-              <a
-                href="/admin-reservations"
-                className="block py-2 text-red-600 font-semibold"
-              >
-                Admin Reservations
-              </a>
-              <a
-                href="/reservations"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Make Reservation
-              </a>
-              
-              <div className="block py-2 text-gray-700 border-t mt-2 pt-2">
-                Admin: {user.name}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="block w-full bg-gray-200 py-2 rounded-full mt-2 hover:bg-gray-300 transition text-left px-4"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+      <Navbar currentPage="admin/reservations" />
 
       {/* Main Content */}
       <div className="pt-20 pb-8 px-4">
@@ -362,9 +310,9 @@ const AdminReservation = () => {
             </p>
           </div>
 
-          {/* Stats and Filters */}
+          {/* Stats and Search Section */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 lg:mb-0">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-800">{reservations.length}</div>
@@ -384,39 +332,116 @@ const AdminReservation = () => {
                 </div>
               </div>
 
-              {/* Filter Buttons */}
+              {/* Filter Toggle Button */}
               <div className="flex space-x-2">
                 <button
-                  onClick={() => setFilter("all")}
-                  className={`px-4 py-2 rounded-lg font-medium ${
-                    filter === "all" 
-                      ? "bg-red-600 text-white" 
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium ${
+                    showFilters || hasActiveFilters
+                      ? "bg-red-600 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >
-                  All
+                  <Filter className="h-4 w-4" />
+                  <span>Filters {hasActiveFilters && "•"}</span>
                 </button>
-                <button
-                  onClick={() => setFilter("upcoming")}
-                  className={`px-4 py-2 rounded-lg font-medium ${
-                    filter === "upcoming" 
-                      ? "bg-green-600 text-white" 
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  Upcoming
-                </button>
-                <button
-                  onClick={() => setFilter("completed")}
-                  className={`px-4 py-2 rounded-lg font-medium ${
-                    filter === "completed" 
-                      ? "bg-gray-600 text-white" 
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  Completed
-                </button>
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  >
+                    Clear All
+                  </button>
+                )}
               </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by reservation ID, name, email, or phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+              />
+            </div>
+
+            {/* Advanced Filters */}
+            {showFilters && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg border">
+                {/* Date Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Time Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time
+                  </label>
+                  <select
+                    value={timeFilter}
+                    onChange={(e) => setTimeFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">All Times</option>
+                    <option value="17:00">5:00 PM</option>
+                    <option value="18:00">6:00 PM</option>
+                    <option value="19:00">7:00 PM</option>
+                    <option value="20:00">8:00 PM</option>
+                    <option value="21:00">9:00 PM</option>
+                  </select>
+                </div>
+
+                {/* Table Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Table Number
+                  </label>
+                  <select
+                    value={tableFilter}
+                    onChange={(e) => setTableFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">All Tables</option>
+                    {Array.from({ length: 20 }, (_, i) => i + 1).map(table => (
+                      <option key={table} value={table}>Table {table}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Status Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="all">All Reservations</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Results Count */}
+            <div className="mt-4 text-sm text-gray-600">
+              Showing {filteredReservations.length} of {reservations.length} reservations
+              {hasActiveFilters && " (filtered)"}
             </div>
           </div>
 
@@ -436,12 +461,22 @@ const AdminReservation = () => {
             {filteredReservations.length === 0 ? (
               <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
                 <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">No Reservations Found</h3>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                  {hasActiveFilters ? "No Matching Reservations" : "No Reservations Found"}
+                </h3>
                 <p className="text-gray-600 mb-8 text-lg">
-                  {filter === "all" 
-                    ? "No reservations have been made yet." 
-                    : `No ${filter} reservations found.`}
+                  {hasActiveFilters 
+                    ? "Try adjusting your search criteria or clear filters." 
+                    : "No reservations have been made yet."}
                 </p>
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition inline-block mr-4"
+                  >
+                    Clear Filters
+                  </button>
+                )}
               </div>
             ) : (
               filteredReservations.map((reservation) => (

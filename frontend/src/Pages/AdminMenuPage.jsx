@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { ChefHat, Plus, Edit2, Trash2, X, Save } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Save } from "lucide-react";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 function AdminMenuPage() {
   const [menus, setMenus] = useState([]);
@@ -210,122 +211,121 @@ function AdminMenuPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <nav className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <ChefHat className="h-8 w-8 text-red-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-800">
-                Admin - Menu Management
-              </span>
-            </div>
-            <a href="/" className="text-gray-700 hover:text-red-600 transition">
-              Back to Home
-            </a>
-          </div>
-        </div>
-      </nav>
+      {/* Use shared Navbar component */}
+      <Navbar currentPage="admin/menu" />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Create Menu Button */}
-        <div className="mb-8">
-          <button
-            onClick={() => openMenuModal()}
-            className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center space-x-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Create New Menu</span>
-          </button>
-        </div>
+   <div className="mb-8 mt-8">  {/* Added mt-8 */}
+  <button
+    onClick={() => openMenuModal()}
+    className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center space-x-2"
+  >
+    <Plus className="h-5 w-5" />
+    <span>Create New Menu</span>
+  </button>
+</div>
 
         {/* Menus List */}
-        <div className="space-y-8">
+        <div className="space-y-12">
           {menus.map((menu) => (
-            <div key={menu._id} className="bg-white rounded-lg shadow-md p-6">
+            <div key={menu._id} className="bg-white rounded-lg shadow-md">
               {/* Menu Header */}
-              <div className="flex justify-between items-start mb-6">
-                <div>
+              <div className="border-b border-gray-200 px-6 py-4">
+                <div className="flex justify-between items-center">
                   <h2 className="text-2xl font-bold text-gray-800">
                     {menu.title}
                   </h2>
-                  {menu.description && (
-                    <p className="text-gray-600 mt-1">{menu.description}</p>
-                  )}
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => openMenuModal(menu)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    >
+                      <Edit2 className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteMenu(menu._id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => openMenuModal(menu)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                  >
-                    <Edit2 className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMenu(menu._id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
+                {menu.description && (
+                  <p className="text-gray-600 mt-1">{menu.description}</p>
+                )}
               </div>
 
               {/* Add Item Button */}
-              <button
-                onClick={() => openItemModal(menu._id)}
-                className="mb-4 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition flex items-center space-x-2 text-sm"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Item to {menu.title}</span>
-              </button>
+              <div className="px-6 py-4 border-b border-gray-200">
+                <button
+                  onClick={() => openItemModal(menu._id)}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition flex items-center space-x-2 text-sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Add Item to {menu.title}</span>
+                </button>
+              </div>
 
               {/* Menu Items */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {menu.items && menu.items.length > 0 ? (
-                  menu.items.map((item) => (
-                    <div
-                      key={item._id}
-                      className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition"
-                    >
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        className="w-full h-40 object-cover"
-                      />
-                      <div className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-gray-800">
-                            {item.name}
-                          </h3>
-                          <span className="text-red-600 font-bold">
+              <div className="p-6">
+                <div className="space-y-4">
+                  {menu.items && menu.items.length > 0 ? (
+                    menu.items.map((item) => (
+                      <div
+                        key={item._id}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <div className="flex items-center space-x-4 flex-1">
+                          {item.imageUrl && (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-800 text-lg">
+                              {item.name}
+                            </h3>
+                            {item.desc && (
+                              <p className="text-gray-600 text-sm mt-1">
+                                {item.desc}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <span className="text-red-600 font-bold text-lg">
                             ${item.price.toFixed(2)}
                           </span>
-                        </div>
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                          {item.desc}
-                        </p>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => openItemModal(menu._id, item)}
-                            className="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded hover:bg-blue-100 transition text-sm font-medium"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteItem(menu._id, item._id)}
-                            className="flex-1 bg-red-50 text-red-600 px-3 py-2 rounded hover:bg-red-100 transition text-sm font-medium"
-                          >
-                            Delete
-                          </button>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => openItemModal(menu._id, item)}
+                              className="bg-blue-50 text-blue-600 px-3 py-2 rounded hover:bg-blue-100 transition text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteItem(menu._id, item._id)}
+                              className="bg-red-50 text-red-600 px-3 py-2 rounded hover:bg-red-100 transition text-sm font-medium"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">
+                        No items in this menu yet.
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 col-span-full text-center py-8">
-                    No items in this menu yet.
-                  </p>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           ))}

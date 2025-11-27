@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
-import { Calendar, Clock, Users, Phone, MapPin, Trash2, Edit2, Menu, X, ChefHat, Check, X as CloseIcon } from "lucide-react";
+import { Calendar, Clock, Users, Phone, MapPin, Trash2, Edit2, Check, X as CloseIcon } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 const MyReservations = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { user } = useContext(AuthContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -18,14 +18,6 @@ const MyReservations = () => {
   });
   const [availableTables, setAvailableTables] = useState([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-
-  const handleLogout = async () => {
-    await fetch(`${API_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    window.location.reload();
-  };
 
   useEffect(() => {
     if (user) {
@@ -164,15 +156,17 @@ const checkAvailability = async () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+const formatDate = (dateString) => {
+  // Create date in UTC to avoid timezone conversion
+  const date = new Date(dateString + 'T00:00:00Z'); // Force UTC time
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC' // Ensure no timezone conversion
+  });
+};
 
   const getStatusColor = (date, time) => {
     const reservationDateTime = new Date(`${date}T${time}`);
@@ -228,134 +222,7 @@ const checkAvailability = async () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <ChefHat className="h-8 w-8 text-red-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-800">
-                Bella Vista
-              </span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-8">
-              <a
-                href="/"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Home
-              </a>
-              <a
-                href="/reservations"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Make Reservation
-              </a>
-              <a
-                href="/my-reservations"
-                className="text-red-600 font-semibold transition"
-              >
-                My Reservations
-              </a>
-            </div>
-
-            {/* Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              {user ? (
-                <>
-                  <span className="text-gray-700">Welcome, {user.name}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-gray-200 px-6 py-2 rounded-full hover:bg-gray-300 transition"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <a
-                    href="/login"
-                    className="text-gray-700 hover:text-red-600 transition font-medium"
-                  >
-                    Login
-                  </a>
-                  <a
-                    href="/register"
-                    className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition"
-                  >
-                    Sign Up
-                  </a>
-                </>
-              )}
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-gray-700"
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-4 pt-2 pb-4 space-y-2">
-              <a
-                href="/"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Home
-              </a>
-              <a
-                href="/reservations"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Make Reservation
-              </a>
-              <a
-                href="/my-reservations"
-                className="block py-2 text-red-600 font-semibold"
-              >
-                My Reservations
-              </a>
-              
-              {user ? (
-                <>
-                  <div className="block py-2 text-gray-700 border-t mt-2 pt-2">
-                    Welcome, {user.name}
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full bg-gray-200 py-2 rounded-full mt-2 hover:bg-gray-300 transition text-left px-4"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <a
-                    href="/login"
-                    className="block py-2 text-gray-700 hover:text-red-600"
-                  >
-                    Login
-                  </a>
-                  <a
-                    href="/register"
-                    className="block w-full bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition mt-2 text-center"
-                  >
-                    Sign Up
-                  </a>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-      </nav>
+      <Navbar currentPage="my-reservations" />
 
       {/* Main Content */}
       <div className="pt-20 pb-8 px-4">

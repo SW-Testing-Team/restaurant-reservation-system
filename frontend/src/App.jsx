@@ -22,7 +22,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/reservations" element={<ReservationPage />} />
         <Route path="/my-reservations" element={<MyReservations />} />
-        <Route path= "/admin/reservation" element={<AdminReservation />} />
+        <Route path= "/admin/reservations" element={<AdminReservation />} />
 
       </Routes>
     </>
