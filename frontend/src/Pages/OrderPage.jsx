@@ -35,12 +35,12 @@ function OrderPage() {
   if (error) return <p>Error fetching menu: {error.message}</p>;
 
   const addToCart = (item) => {
-    const existingItem = cart.find((cartItem) => cartItem.id === item._id);
+    const existingItem = cart.find((cartItem) => cartItem._id === item._id);
 
     if (existingItem) {
       setCart(
         cart.map((cartItem) =>
-          cartItem.id === item._id
+          cartItem._id === item._id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
         )
@@ -83,7 +83,7 @@ function OrderPage() {
     }
     console.log("cart", cart);
     axios.post("http://localhost:3000/orders", {
-      userId: "6924f1248e814dbf2dfbe88b", //Replace with actual user ID
+      userId: user.id, //Replace with actual user ID
       type: orderType,
       items: cart.map((item) => ({
         menuItemId: item._id,

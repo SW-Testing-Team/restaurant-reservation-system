@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/authContext";
 import { Menu, X, ChefHat } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -9,7 +10,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const location = useLocation();
-
+  const navigate = useNavigate();
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -22,11 +23,11 @@ const Navbar = () => {
     };
 
     if (isAdminPanelOpen) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [isAdminPanelOpen]);
 
@@ -40,10 +41,10 @@ const Navbar = () => {
 
   const getNavLinkClass = (pageName) => {
     // For admin pages, keep "Admin Panel" active
-    if (pageName === "admin" && (location.pathname.includes("/admin/"))) {
+    if (pageName === "admin" && location.pathname.includes("/admin/")) {
       return "text-red-600 font-semibold transition";
     }
-    
+
     // For regular pages
     if (pageName === "home" && location.pathname === "/home") {
       return "text-red-600 font-semibold transition";
@@ -51,13 +52,16 @@ const Navbar = () => {
     if (pageName === "reservations" && location.pathname === "/reservations") {
       return "text-red-600 font-semibold transition";
     }
-    if (pageName === "my-reservations" && location.pathname === "/my-reservations") {
+    if (
+      pageName === "my-reservations" &&
+      location.pathname === "/my-reservations"
+    ) {
       return "text-red-600 font-semibold transition";
     }
     if (pageName === "profile" && location.pathname === "/profile") {
       return "text-red-600 font-semibold transition";
     }
-    
+
     return "text-gray-700 hover:text-red-600 transition";
   };
 
@@ -70,7 +74,7 @@ const Navbar = () => {
       // If already on home page, just scroll
       const element = document.getElementById(section);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: "smooth" });
       }
     }
     setIsMenuOpen(false);
@@ -85,6 +89,10 @@ const Navbar = () => {
     e.stopPropagation(); // Prevent the click from bubbling to document
     setIsAdminPanelOpen(false);
   };
+
+  // Check if we're on home page and user is logged in (and not admin)
+  const isHomePage = location.pathname === "/home";
+  const showOrderButton = isHomePage && user && user.role !== "admin";
 
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
@@ -102,28 +110,34 @@ const Navbar = () => {
             <a href="/home" className={getNavLinkClass("home")}>
               Home
             </a>
-            
+
             {/* Menu and About links - work as anchors */}
-            <button 
+            <button
               onClick={(e) => handleMenuClick(e, "menu")}
               className="text-gray-700 hover:text-red-600 transition"
             >
               Menu
             </button>
-            <button 
+            <button
               onClick={(e) => handleMenuClick(e, "about")}
               className="text-gray-700 hover:text-red-600 transition"
             >
               About
             </button>
-            
+
             {/* Regular user links */}
             {user && user.role !== "admin" && (
               <>
-                <a href="/reservations" className={getNavLinkClass("reservations")}>
+                <a
+                  href="/reservations"
+                  className={getNavLinkClass("reservations")}
+                >
                   Make Reservation
                 </a>
-                <a href="/my-reservations" className={getNavLinkClass("my-reservations")}>
+                <a
+                  href="/my-reservations"
+                  className={getNavLinkClass("my-reservations")}
+                >
                   My Reservations
                 </a>
               </>
@@ -134,13 +148,15 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={handleAdminPanelClick}
-                  className={`flex items-center space-x-1 ${getNavLinkClass("admin")}`}
+                  className={`flex items-center space-x-1 ${getNavLinkClass(
+                    "admin"
+                  )}`}
                 >
                   <span>Admin Panel</span>
                 </button>
-                
+
                 {isAdminPanelOpen && (
-                  <div 
+                  <div
                     className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                   >
@@ -183,10 +199,17 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <a
-                  href="/profile"
-                  className={getNavLinkClass("profile")}
-                >
+                {/* Start Ordering Button - Only show on home page for non-admin users */}
+                {showOrderButton && (
+                  <button
+                    onClick={() => navigate(`/order`)}
+                    className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition font-medium"
+                  >
+                    Start Ordering
+                  </button>
+                )}
+
+                <a href="/profile" className={getNavLinkClass("profile")}>
                   Profile
                 </a>
                 <button
@@ -204,7 +227,11 @@ const Navbar = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden text-gray-700"
           >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
       </div>
@@ -216,28 +243,34 @@ const Navbar = () => {
             <a href="/home" className={`block py-2 ${getNavLinkClass("home")}`}>
               Home
             </a>
-            
+
             {/* Menu and About links - Mobile */}
-            <button 
+            <button
               onClick={(e) => handleMenuClick(e, "menu")}
               className="block w-full text-left py-2 text-gray-700 hover:text-red-600 transition"
             >
               Menu
             </button>
-            <button 
+            <button
               onClick={(e) => handleMenuClick(e, "about")}
               className="block w-full text-left py-2 text-gray-700 hover:text-red-600 transition"
             >
               About
             </button>
-            
+
             {/* Regular user links - Mobile */}
             {user && user.role !== "admin" && (
               <>
-                <a href="/reservations" className={`block py-2 ${getNavLinkClass("reservations")}`}>
+                <a
+                  href="/reservations"
+                  className={`block py-2 ${getNavLinkClass("reservations")}`}
+                >
                   Make Reservation
                 </a>
-                <a href="/my-reservations" className={`block py-2 ${getNavLinkClass("my-reservations")}`}>
+                <a
+                  href="/my-reservations"
+                  className={`block py-2 ${getNavLinkClass("my-reservations")}`}
+                >
                   My Reservations
                 </a>
               </>
@@ -249,15 +282,21 @@ const Navbar = () => {
                 <div className="text-gray-700 font-semibold py-2 border-t mt-2 pt-2">
                   Admin Panel
                 </div>
-                <a href="/admin/reservations" className={`block py-2 pl-4 ${getNavLinkClass("admin")}`}>
+                <a
+                  href="/admin/reservations"
+                  className={`block py-2 pl-4 ${getNavLinkClass("admin")}`}
+                >
                   All Reservations
                 </a>
-                <a href="/admin/menu" className={`block py-2 pl-4 ${getNavLinkClass("admin")}`}>
+                <a
+                  href="/admin/menu"
+                  className={`block py-2 pl-4 ${getNavLinkClass("admin")}`}
+                >
                   Menu Management
                 </a>
               </>
             )}
-            
+
             {/* Auth Section - Mobile */}
             <div className="border-t mt-2 pt-2">
               {!loading && !user ? (
@@ -277,6 +316,16 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
+                  {/* Start Ordering Button - Mobile - Only show on home page for non-admin users */}
+                  {showOrderButton && (
+                    <button
+                      onClick={() => Navigate(`/order`)}
+                      className="block w-full bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition mt-2 text-center font-medium"
+                    >
+                      Start Ordering
+                    </button>
+                  )}
+
                   <a
                     href="/profile"
                     className={`block py-2 ${getNavLinkClass("profile")}`}
