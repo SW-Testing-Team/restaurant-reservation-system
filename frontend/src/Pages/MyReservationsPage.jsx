@@ -1,7 +1,20 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
-import { Calendar, Clock, Users, Phone, MapPin, Trash2, Edit2, Check, X as CloseIcon } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Phone,
+  MapPin,
+  Trash2,
+  Edit2,
+  Check,
+  NotebookPen,
+  X as CloseIcon,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
+import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const MyReservations = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -14,10 +27,11 @@ const MyReservations = () => {
     date: "",
     time: "",
     guests: 2,
-    phoneNumber: ""
+    phoneNumber: "",
   });
   const [availableTables, setAvailableTables] = useState([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -38,9 +52,9 @@ const MyReservations = () => {
       const response = await fetch(`${API_URL}/reservations/my-reservations`, {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -57,23 +71,23 @@ const MyReservations = () => {
     }
   };
 
-const checkAvailability = async () => {
-  setCheckingAvailability(true);
-  try {
-    const response = await fetch(
-      `${API_URL}/reservations/available-for-update/${editingReservation}?date=${editFormData.date}&time=${editFormData.time}`
-    );
-    if (response.ok) {
-      const tables = await response.json();
-      setAvailableTables(tables);
+  const checkAvailability = async () => {
+    setCheckingAvailability(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/reservations/available-for-update/${editingReservation}?date=${editFormData.date}&time=${editFormData.time}`
+      );
+      if (response.ok) {
+        const tables = await response.json();
+        setAvailableTables(tables);
+      }
+    } catch (error) {
+      console.error("Error checking availability:", error);
+      setAvailableTables([]);
+    } finally {
+      setCheckingAvailability(false);
     }
-  } catch (error) {
-    console.error("Error checking availability:", error);
-    setAvailableTables([]);
-  } finally {
-    setCheckingAvailability(false);
-  }
-};
+  };
 
   const cancelReservation = async (reservationId) => {
     if (!confirm("Are you sure you want to cancel this reservation?")) {
@@ -85,14 +99,16 @@ const checkAvailability = async () => {
       const response = await fetch(`${API_URL}/reservations/${reservationId}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
         setMessage("Reservation cancelled successfully");
-        setReservations(reservations.filter(res => res._id !== reservationId));
+        setReservations(
+          reservations.filter((res) => res._id !== reservationId)
+        );
         setTimeout(() => setMessage(""), 3000);
       } else {
         setMessage("Failed to cancel reservation");
@@ -109,7 +125,7 @@ const checkAvailability = async () => {
       date: reservation.date,
       time: reservation.time,
       guests: reservation.guests,
-      phoneNumber: reservation.phoneNumber || ""
+      phoneNumber: reservation.phoneNumber || "",
     });
     setAvailableTables([]);
   };
@@ -122,7 +138,10 @@ const checkAvailability = async () => {
 
   const updateReservation = async (reservationId) => {
     // Check if date/time changed and if tables are available
-    if ((editFormData.date || editFormData.time) && availableTables.length === 0) {
+    if (
+      (editFormData.date || editFormData.time) &&
+      availableTables.length === 0
+    ) {
       setMessage("No tables available for the selected date and time");
       return;
     }
@@ -133,10 +152,10 @@ const checkAvailability = async () => {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
-        body: JSON.stringify(editFormData)
+        body: JSON.stringify(editFormData),
       });
 
       if (response.ok) {
@@ -156,22 +175,22 @@ const checkAvailability = async () => {
     }
   };
 
-const formatDate = (dateString) => {
-  // Create date in UTC to avoid timezone conversion
-  const date = new Date(dateString + 'T00:00:00Z'); // Force UTC time
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC' // Ensure no timezone conversion
-  });
-};
+  const formatDate = (dateString) => {
+    // Create date in UTC to avoid timezone conversion
+    const date = new Date(dateString + "T00:00:00Z"); // Force UTC time
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC", // Ensure no timezone conversion
+    });
+  };
 
   const getStatusColor = (date, time) => {
     const reservationDateTime = new Date(`${date}T${time}`);
     const now = new Date();
-    
+
     if (reservationDateTime < now) {
       return "bg-gray-100 text-gray-600";
     }
@@ -181,7 +200,7 @@ const formatDate = (dateString) => {
   const getStatusText = (date, time) => {
     const reservationDateTime = new Date(`${date}T${time}`);
     const now = new Date();
-    
+
     if (reservationDateTime < now) {
       return "Completed";
     }
@@ -189,7 +208,10 @@ const formatDate = (dateString) => {
   };
 
   const isDateTimeChanged = (reservation) => {
-    return editFormData.date !== reservation.date || editFormData.time !== reservation.time;
+    return (
+      editFormData.date !== reservation.date ||
+      editFormData.time !== reservation.time
+    );
   };
 
   if (loading) {
@@ -207,8 +229,12 @@ const formatDate = (dateString) => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Access Required</h2>
-          <p className="text-gray-600 mb-6">Please log in to view your reservations.</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Access Required
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Please log in to view your reservations.
+          </p>
           <a
             href="/login"
             className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition inline-block"
@@ -239,11 +265,13 @@ const formatDate = (dateString) => {
 
           {/* Message Display */}
           {message && (
-            <div className={`mb-8 p-4 rounded-lg text-center ${
-              message.includes("successfully") 
-                ? "bg-green-50 border border-green-200 text-green-800"
-                : "bg-red-50 border border-red-200 text-red-800"
-            }`}>
+            <div
+              className={`mb-8 p-4 rounded-lg text-center ${
+                message.includes("successfully")
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : "bg-red-50 border border-red-200 text-red-800"
+              }`}
+            >
               {message}
             </div>
           )}
@@ -253,8 +281,12 @@ const formatDate = (dateString) => {
             {reservations.length === 0 ? (
               <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
                 <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">No Reservations Yet</h3>
-                <p className="text-gray-600 mb-8 text-lg">You haven't made any reservations yet.</p>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                  No Reservations Yet
+                </h3>
+                <p className="text-gray-600 mb-8 text-lg">
+                  You haven't made any reservations yet.
+                </p>
                 <a
                   href="/reservations"
                   className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-700 transition inline-block text-lg"
@@ -274,9 +306,15 @@ const formatDate = (dateString) => {
                       <div className="flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                           <h3 className="text-2xl font-bold text-gray-800 mb-2 sm:mb-0">
-                            Reservation #{reservation._id.slice(-6).toUpperCase()}
+                            Reservation #
+                            {reservation._id.slice(-6).toUpperCase()}
                           </h3>
-                          <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(reservation.date, reservation.time)}`}>
+                          <span
+                            className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
+                              reservation.date,
+                              reservation.time
+                            )}`}
+                          >
                             {getStatusText(reservation.date, reservation.time)}
                           </span>
                         </div>
@@ -288,19 +326,31 @@ const formatDate = (dateString) => {
                               <Calendar className="h-6 w-6 text-red-600" />
                             </div>
                             <div className="flex-1">
-                              <p className="text-sm text-gray-500 font-medium mb-1">Date & Time</p>
+                              <p className="text-sm text-gray-500 font-medium mb-1">
+                                Date & Time
+                              </p>
                               {editingReservation === reservation._id ? (
                                 <div className="space-y-2">
                                   <input
                                     type="date"
                                     value={editFormData.date}
-                                    onChange={(e) => setEditFormData({...editFormData, date: e.target.value})}
+                                    onChange={(e) =>
+                                      setEditFormData({
+                                        ...editFormData,
+                                        date: e.target.value,
+                                      })
+                                    }
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                    min={new Date().toISOString().split('T')[0]}
+                                    min={new Date().toISOString().split("T")[0]}
                                   />
                                   <select
                                     value={editFormData.time}
-                                    onChange={(e) => setEditFormData({...editFormData, time: e.target.value})}
+                                    onChange={(e) =>
+                                      setEditFormData({
+                                        ...editFormData,
+                                        time: e.target.value,
+                                      })
+                                    }
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                   >
                                     <option value="">Select time</option>
@@ -311,32 +361,41 @@ const formatDate = (dateString) => {
                                     <option value="21:00">9:00 PM</option>
                                   </select>
                                   {/* Availability Check */}
-                                  {isDateTimeChanged(reservation) && editFormData.date && editFormData.time && (
-                                    <div className={`p-2 rounded-lg text-sm ${
-                                      checkingAvailability 
-                                        ? "bg-blue-50 text-blue-800" 
-                                        : availableTables.length > 0 
-                                          ? "bg-green-50 text-green-800" 
-                                          : "bg-red-50 text-red-800"
-                                    }`}>
-                                      {checkingAvailability ? (
-                                        <div className="flex items-center space-x-2">
-                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                          <span>Checking availability...</span>
-                                        </div>
-                                      ) : availableTables.length > 0 ? (
-                                        <div className="flex items-center space-x-2">
-                                          <Check className="h-4 w-4" />
-                                          <span>{availableTables.length} tables available</span>
-                                        </div>
-                                      ) : (
-                                        <div className="flex items-center space-x-2">
-                                          <CloseIcon className="h-4 w-4" />
-                                          <span>No tables available</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
+                                  {isDateTimeChanged(reservation) &&
+                                    editFormData.date &&
+                                    editFormData.time && (
+                                      <div
+                                        className={`p-2 rounded-lg text-sm ${
+                                          checkingAvailability
+                                            ? "bg-blue-50 text-blue-800"
+                                            : availableTables.length > 0
+                                            ? "bg-green-50 text-green-800"
+                                            : "bg-red-50 text-red-800"
+                                        }`}
+                                      >
+                                        {checkingAvailability ? (
+                                          <div className="flex items-center space-x-2">
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                            <span>
+                                              Checking availability...
+                                            </span>
+                                          </div>
+                                        ) : availableTables.length > 0 ? (
+                                          <div className="flex items-center space-x-2">
+                                            <Check className="h-4 w-4" />
+                                            <span>
+                                              {availableTables.length} tables
+                                              available
+                                            </span>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center space-x-2">
+                                            <CloseIcon className="h-4 w-4" />
+                                            <span>No tables available</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                 </div>
                               ) : (
                                 <div>
@@ -357,20 +416,30 @@ const formatDate = (dateString) => {
                               <Users className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500 font-medium mb-1">Table & Guests</p>
+                              <p className="text-sm text-gray-500 font-medium mb-1">
+                                Table & Guests
+                              </p>
                               {editingReservation === reservation._id ? (
                                 <select
                                   value={editFormData.guests}
-                                  onChange={(e) => setEditFormData({...editFormData, guests: parseInt(e.target.value)})}
+                                  onChange={(e) =>
+                                    setEditFormData({
+                                      ...editFormData,
+                                      guests: parseInt(e.target.value),
+                                    })
+                                  }
                                   className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 >
-                                  {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                                    <option key={num} value={num}>{num} guests</option>
+                                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                    <option key={num} value={num}>
+                                      {num} guests
+                                    </option>
                                   ))}
                                 </select>
                               ) : (
                                 <p className="font-semibold text-gray-800 text-lg">
-                                  Table {reservation.tableNumber} • {reservation.guests} guests
+                                  Table {reservation.tableNumber} •{" "}
+                                  {reservation.guests} guests
                                 </p>
                               )}
                             </div>
@@ -382,12 +451,19 @@ const formatDate = (dateString) => {
                               <Phone className="h-6 w-6 text-green-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500 font-medium mb-1">Contact</p>
+                              <p className="text-sm text-gray-500 font-medium mb-1">
+                                Contact
+                              </p>
                               {editingReservation === reservation._id ? (
                                 <input
                                   type="tel"
                                   value={editFormData.phoneNumber}
-                                  onChange={(e) => setEditFormData({...editFormData, phoneNumber: e.target.value})}
+                                  onChange={(e) =>
+                                    setEditFormData({
+                                      ...editFormData,
+                                      phoneNumber: e.target.value,
+                                    })
+                                  }
                                   className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                   placeholder="01012345678"
                                 />
@@ -405,7 +481,9 @@ const formatDate = (dateString) => {
                               <MapPin className="h-6 w-6 text-purple-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500 font-medium mb-1">Location</p>
+                              <p className="text-sm text-gray-500 font-medium mb-1">
+                                Location
+                              </p>
                               <p className="font-semibold text-gray-800 text-lg">
                                 Bella Vista Restaurant
                               </p>
@@ -420,7 +498,10 @@ const formatDate = (dateString) => {
                           <>
                             <button
                               onClick={() => updateReservation(reservation._id)}
-                              disabled={isDateTimeChanged(reservation) && availableTables.length === 0}
+                              disabled={
+                                isDateTimeChanged(reservation) &&
+                                availableTables.length === 0
+                              }
                               className="flex items-center justify-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <Check className="h-4 w-4" />
@@ -449,6 +530,13 @@ const formatDate = (dateString) => {
                             >
                               <Trash2 className="h-4 w-4" />
                               <span>Cancel</span>
+                            </button>
+                            <button
+                              onClick={() => navigate("/order")}
+                              className="flex items-center justify-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition font-semibold"
+                            >
+                              <NotebookPen className="h-4 w-4" />
+                              <span>Start Ordering</span>
                             </button>
                           </>
                         )}
