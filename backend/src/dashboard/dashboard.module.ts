@@ -1,4 +1,20 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Reservation, ReservationSchema } from '../reservations/models/reservation.schema';
+import { Order, OrderSchema } from '../menu-order/models/Order.schema';
+import { MenuItem, MenuItemSchema } from '../menu-order/models/MenuItem.schema';
+import { DashboardService } from './dashboard.service';
+import { DashboardController } from './dashboard.controller';
 
-@Module({})
+@Module({
+  imports: [
+    MongooseModule.forFeature([
+      { name: Reservation.name, schema: ReservationSchema },
+      { name: Order.name, schema: OrderSchema },
+      { name: MenuItem.name, schema: MenuItemSchema },
+    ]),
+  ],
+  controllers: [DashboardController],
+  providers: [DashboardService],
+})
 export class DashboardModule {}

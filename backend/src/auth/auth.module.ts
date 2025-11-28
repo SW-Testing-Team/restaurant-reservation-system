@@ -20,9 +20,11 @@ import { CounterSchema } from 'src/common/schemas/counter.schema';
         inject: [ConfigService],
         useFactory: (config: ConfigService) => {
             const expires = config.get<string>('JWT_EXPIRES_IN');
+            // Use environment variable or fallback to default for development
+            const secret = config.get<string>('JWT_SECRET') || 'verysecretkey123';
 
             return {
-            secret: config.get<string>('JWT_SECRET'),
+            secret: secret,
             signOptions: {
                 expiresIn: expires ? Number(expires) : 86400, // force number
             },
