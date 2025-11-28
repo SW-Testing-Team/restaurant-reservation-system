@@ -102,26 +102,28 @@ async getRestaurantFeedbackCount(): Promise<number> {
 
 
 //get the newest 5 feedbacks 
-    async getRecentRestaurantFeedbacks() {
-    return this.restaurantFeedback
-      .find({}, { rating: 1, message: 1, date: 1 })
-      .populate('userId', 'username profilePicture')
-      .sort({ date: -1 })
-      .limit(5)
-      .lean()
-      .exec()
-      .then(feedbacks =>
-        feedbacks.map(fb => {
-          const user = fb.userId as unknown as populatedUser;
-          return {
-            username: user.name,
-            rating: fb.rating,
-            message: fb.message,
-            date: fb.date,
-          };
-        })
-      );
-  }
+async getRecentRestaurantFeedbacks() {
+  return this.restaurantFeedback
+    .find()                         // remove { rating: 1, message: 1, date: 1 }
+    .populate('userId', 'name')     // select only the name from User
+    .sort({ date: -1 })
+    .limit(5)
+    .lean()
+    .exec()
+    .then(feedbacks =>
+      feedbacks.map(fb => {
+        const user = fb.userId as unknown as populatedUser;
+        return {
+          username: user?.name || 'Anonymous', // fallback
+          rating: fb.rating,
+          message: fb.message,
+          date: fb.date,
+        };
+      })
+    );
+}
+
+
   
       
   //get all feedbacks sorted by date
@@ -129,8 +131,14 @@ async getRestaurantFeedbackCount(): Promise<number> {
     return this.restaurantFeedback
       .find()
       .sort({ date: -1 })
+  
+      .populate('userId', 'name email phone')
+      .populate('adminId', 'name email phone')
+
+      .lean() // convert to plain JS objects
       .exec();
   }
+  
   
 
   

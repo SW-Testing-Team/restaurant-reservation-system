@@ -9,6 +9,9 @@ import ReservationPage from "./Pages/ReservationPage";
 import MyReservations from "./Pages/MyReservationsPage";
 import AdminReservation from "./Pages/AdminReservation";
 import AdminRestaurantFeedbacks from "./Pages/AdminRestaurantFeedbacks";
+import CustomerReviewsPage from "./Pages/CustomerReviewsPage";
+
+
 
 function App() {
   return (
@@ -25,6 +28,8 @@ function App() {
         <Route path="/my-reservations" element={<MyReservations />} />
         <Route path= "/admin/reservations" element={<AdminReservation />} />
         <Route path="/admin/restaurantFeedbacks" element={<AdminRestaurantFeedbacks />} />
+        <Route path="/all-reviews" element={<CustomerReviewsPage />} />
+
 
       </Routes>
     </>
