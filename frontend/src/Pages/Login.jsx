@@ -3,7 +3,6 @@ import { Mail, Lock, ChefHat } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 
-
 const Login = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,14 +11,12 @@ const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
 
-
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-    const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -51,15 +48,15 @@ const Login = () => {
       //alert("Login successful!");
 
       setUser(data.data); // user info
+      console.log(data.data);
       // Redirect user
-      navigate("/home");;
+      navigate("/home");
     } catch (error) {
       console.error(error);
       setErrorMessage("Server error. Please try again later.");
       //alert("Something went wrong");
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4">

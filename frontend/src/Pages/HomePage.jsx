@@ -1,336 +1,56 @@
 import { useState, useEffect, useContext } from "react";
-import { Menu, X, ChefHat, Clock, MapPin, Phone } from "lucide-react";
 import { AuthContext } from "../context/authContext";
-
 import axios from "axios";
+import Navbar from "../components/Navbar";
+import { Clock, MapPin, Phone, ChefHat } from "lucide-react";
 
 function Homepage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, loading } = useContext(AuthContext);
+  const [menu, setMenu] = useState([]);
+  const [error, setError] = useState(null);
 
   const handleLogout = async () => {
     await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
-
-    window.location.reload(); // refresh state
+    window.location.reload();
   };
-
-  // const menuItems = [
-  //   {
-  //     category: "Appetizers",
-  //     items: [
-  //       {
-  //         name: "Bruschetta",
-  //         price: "$8.99",
-  //         desc: "Grilled bread with tomatoes and basil",
-  //         image:
-  //           "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop",
-  //       },
-  //       {
-  //         name: "Calamari",
-  //         price: "$12.99",
-  //         desc: "Crispy fried squid with marinara",
-  //         image:
-  //           "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&fit=crop",
-  //       },
-  //       {
-  //         name: "Caesar Salad",
-  //         price: "$9.99",
-  //         desc: "Romaine lettuce with classic dressing",
-  //         image:
-  //           "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     category: "Main Courses",
-  //     items: [
-  //       {
-  //         name: "Grilled Salmon",
-  //         price: "$24.99",
-  //         desc: "Fresh Atlantic salmon with herbs",
-  //         image:
-  //           "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
-  //       },
-  //       {
-  //         name: "Ribeye Steak",
-  //         price: "$32.99",
-  //         desc: "12oz prime beef with vegetables",
-  //         image:
-  //           "https://images.unsplash.com/photo-1558030006-450675393462?w=400&h=300&fit=crop",
-  //       },
-  //       {
-  //         name: "Pasta Carbonara",
-  //         price: "$18.99",
-  //         desc: "Creamy pasta with bacon and egg",
-  //         image:
-  //           "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     category: "Desserts",
-  //     items: [
-  //       {
-  //         name: "Tiramisu",
-  //         price: "$7.99",
-  //         desc: "Classic Italian dessert",
-  //         image:
-  //           "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop",
-  //       },
-  //       {
-  //         name: "Chocolate Lava Cake",
-  //         price: "$8.99",
-  //         desc: "Warm cake with molten center",
-  //         image:
-  //           "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop",
-  //       },
-  //       {
-  //         name: "Panna Cotta",
-  //         price: "$6.99",
-  //         desc: "Vanilla cream with berry sauce",
-  //         image:
-  //           "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop",
-  //       },
-  //     ],
-  //   },
-  // ];
-
-  const [menu, setMenu] = useState([]); // state to hold menu data
-  const [error, setError] = useState(null); // state for errors
 
   useEffect(() => {
     const fetchMenu = async () => {
       try {
         const response = await axios.get("http://localhost:3000/menu");
-        setMenu(response.data); // store menu in state
+        setMenu(response.data);
       } catch (err) {
         setError(err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchMenu();
-  }, []); // empty dependency array → runs once on mount
+  }, []);
 
-  if (loading) return <p>Loading menu...</p>;
-  if (error) return <p>Error fetching menu: {error.message}</p>;
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-red-600 text-xl">Error fetching menu: {error.message}</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <ChefHat className="h-8 w-8 text-red-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-800">
-                Bella Vista
-              </span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-8">
-              <a
-                href="#home"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Home
-              </a>
-              <a
-                href="#menu"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Menu
-              </a>
-              <a
-                href="#about"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                About
-              </a>
-              <a
-                href="#contact"
-                className="text-gray-700 hover:text-red-600 transition"
-              >
-                Contact
-              </a>
-            </div>
-
-            {/* <div className="hidden md:flex items-center space-x-4">
-              <a
-                href="/login"
-                className="text-gray-700 hover:text-red-600 transition font-medium"
-              >
-                Login
-              </a>
-              <a
-                href="/register"
-                className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition"
-              >
-                Sign Up
-              </a>
-            </div> */}
-
-            {/* AUTH BUTTONS */}
-            <div className="hidden md:flex items-center space-x-4">
-              {!loading && !user ? (
-                <>
-                  <a
-                    href="/login"
-                    className="text-gray-700 hover:text-red-600 transition font-medium"
-                  >
-                    Login
-                  </a>
-                  <a
-                    href="/register"
-                    className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition"
-                  >
-                    Sign Up
-                  </a>
-                </>
-              ) : (
-                <>
-                  <a
-                    href="/profile"
-                    className="text-gray-700 hover:text-red-600 transition font-medium"
-                  >
-                    {"Profile"}
-                  </a>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-gray-200 px-6 py-2 rounded-full hover:bg-gray-300 transition"
-                  >
-                    Logout
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-gray-700"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {/* {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-4 pt-2 pb-4 space-y-2">
-              <a
-                href="#home"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Home
-              </a>
-              <a
-                href="#menu"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Menu
-              </a>
-              <a
-                href="#about"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                About
-              </a>
-              <a
-                href="#contact"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Contact
-              </a>
-              <a
-                href="/login"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Login
-              </a>
-              <a
-                href="/register"
-                className="block w-full bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition mt-2 text-center"
-              >
-                Sign Up
-              </a>
-            </div>
-          </div>
-        )} */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-4 pt-2 pb-4 space-y-2">
-              <a
-                href="#home"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Home
-              </a>
-              <a
-                href="#menu"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Menu
-              </a>
-              <a
-                href="#about"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                About
-              </a>
-              <a
-                href="#contact"
-                className="block py-2 text-gray-700 hover:text-red-600"
-              >
-                Contact
-              </a>
-
-              {!loading && !user ? (
-                <>
-                  <a
-                    href="/login"
-                    className="block py-2 text-gray-700 hover:text-red-600"
-                  >
-                    Login
-                  </a>
-                  <a
-                    href="/register"
-                    className="block bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition mt-2 text-center"
-                  >
-                    Sign Up
-                  </a>
-                </>
-              ) : (
-                <>
-                  <a
-                    href="/profile"
-                    className="block py-2 text-gray-700 hover:text-red-600"
-                  >
-                    {user?.name || "Profile"}
-                  </a>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full bg-gray-200 py-2 rounded-full mt-2 hover:bg-gray-300 transition"
-                  >
-                    Logout
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-      </nav>
-
+      <Navbar currentPage="home" />
+      
       {/* Hero Section */}
       <section
         id="home"
@@ -402,7 +122,7 @@ function Homepage() {
                             {item.name}
                           </h4>
                           <span className="text-red-600 font-bold">
-                            {item.price}$
+                            ${item.price}
                           </span>
                         </div>
                         <p className="text-gray-600 text-sm">{item.desc}</p>
@@ -444,9 +164,11 @@ function Homepage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Visit Us Today</h2>
           <p className="text-xl mb-8">Experience the taste of Italy</p>
-          <button className="bg-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-red-700 transition">
-            Make a Reservation
-          </button>
+          <a href="/reservations">
+            <button className="bg-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-red-700 transition">
+              Make a Reservation
+            </button>
+          </a>
         </div>
       </section>
 

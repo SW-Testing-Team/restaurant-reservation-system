@@ -1,16 +1,19 @@
 import {
-  IsArray,
-  IsMongoId,
-  IsNumber,
-  IsOptional,
   IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+  IsArray,
   ValidateNested,
+  IsMongoId,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class OrderItemDto {
+export class OrderItemDto {
   @IsMongoId()
+  @IsNotEmpty()
   menuItemId: string;
 
   @IsNumber()
@@ -20,12 +23,24 @@ class OrderItemDto {
 
 export class CreateOrderDto {
   @IsMongoId()
+  @IsNotEmpty()
   userId: string;
+
+  @IsEnum(['dine-in', 'takeaway', 'delivery'])
+  type: string;
+
+  @IsOptional()
+  @IsNumber()
+  tableNumber?: number;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items: OrderItemDto[];
+
+  @IsOptional()
+  @IsEnum(['preparing', 'ready', 'cancelled'])
+  status?: string;
 
   @IsOptional()
   @IsString()
