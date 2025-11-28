@@ -41,10 +41,15 @@ async createRestaurantFeedback(userId: string, message: string, rating: number) 
 
 //returns all the feedbacks 
 async getAllRestaurantFeedbacks() {
-    // Fetch all feedbacks, sorted by newest first
-    return this.restaurantFeedback.find().sort({ date: -1 }).exec();
-  }
-  
+  return this.restaurantFeedback
+    .find()
+    .sort({ date: -1 })
+    .populate('userId', 'name email role phone')    // only select relevant user fields
+    .populate('adminId', 'name email role phone')   // only select relevant admin fields
+    .exec();
+}
+
+
 
 //admin reply to a feedback
 async replyRestaurantFeedback(
