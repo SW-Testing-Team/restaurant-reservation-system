@@ -174,6 +174,17 @@ const Navbar = () => {
                     >
                       Menu Management
                     </a>
+
+
+                    <a
+                    href="/admin/restaurantFeedbacks"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
+                    onClick={handleAdminLinkClick}
+                  >
+                    View All Feedbacks
+                  </a>
+
+
                   </div>
                 )}
               </div>
