@@ -2,9 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { Calendar, Clock, Users, Phone } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { API_URL } from "../config/api";
 
 const ReservationPage = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
   const { user, loading: authLoading } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     date: "",

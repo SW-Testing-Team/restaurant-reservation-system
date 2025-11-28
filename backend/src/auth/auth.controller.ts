@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards, Req, HttpCode, HttpStatus, Res, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -11,7 +12,10 @@ import type { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   async register(
@@ -25,11 +29,12 @@ export class AuthController {
     // };
     const { user, token } = await this.authService.register(dto);
 
-    // SET COOKIE HERE
+    // SET COOKIE HERE - Environment-aware for local dev and Vercel
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false, // localhost only
-      sameSite: 'lax',
+      secure: isProduction, // true in production/Vercel (HTTPS), false for localhost
+      sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-domain (Vercel), 'lax' for localhost
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -58,11 +63,12 @@ export class AuthController {
     // };
     const { user, token } = await this.authService.login(email, password);
 
-    // SET COOKIE HERE
+    // SET COOKIE HERE - Environment-aware for local dev and Vercel
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProduction, // true in production/Vercel (HTTPS), false for localhost
+      sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-domain (Vercel), 'lax' for localhost
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

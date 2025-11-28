@@ -3,9 +3,9 @@ import { AuthContext } from "../context/authContext";
 import { Menu, X, ChefHat } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 const Navbar = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
   const { user, loading } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);

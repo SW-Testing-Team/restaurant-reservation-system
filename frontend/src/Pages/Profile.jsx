@@ -1,11 +1,12 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
+import { API_URL } from "../config/api";
 
 function Profile() {
   const { user } = useContext(AuthContext);
 
   const handleLogout = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+    await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

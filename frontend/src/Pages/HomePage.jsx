@@ -3,6 +3,7 @@ import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { Clock, MapPin, Phone, ChefHat } from "lucide-react";
+import { API_URL } from "../config/api";
 
 function Homepage() {
   const { user, loading } = useContext(AuthContext);
@@ -10,7 +11,7 @@ function Homepage() {
   const [error, setError] = useState(null);
 
   const handleLogout = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+    await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -20,7 +21,7 @@ function Homepage() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/menu");
+        const response = await axios.get(`${API_URL}/menu`);
         setMenu(response.data);
       } catch (err) {
         setError(err);

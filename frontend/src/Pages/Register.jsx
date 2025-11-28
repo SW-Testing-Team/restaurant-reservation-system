@@ -2,10 +2,10 @@ import { useState, useContext } from "react";
 import { ChefHat, Mail, Lock, User, Phone } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 
 function Register() {
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const navigate = useNavigate();
 

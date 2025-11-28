@@ -11,9 +11,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Navbar from "../components/Navbar";
+import { API_URL } from "../config/api";
 
 function AdminDashboard() {
-  const API_URL = import.meta.env.VITE_API_URL;
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,7 +53,7 @@ function AdminDashboard() {
     };
 
     fetchStats();
-  }, [API_URL]);
+  }, []);
 
   // Format currency
   const formatCurrency = (amount) => {

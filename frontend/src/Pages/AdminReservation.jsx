@@ -2,9 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { Calendar, Clock, Users, Phone, MapPin, Trash2, Edit2, Check, X as CloseIcon, User, Mail, Search, Filter } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { API_URL } from "../config/api";
 
 const AdminReservation = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
   const { user } = useContext(AuthContext);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
