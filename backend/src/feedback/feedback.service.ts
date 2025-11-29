@@ -100,6 +100,26 @@ async getRestaurantFeedbackCount(): Promise<number> {
   }
 
 
+//it return the stats for the admin feedbacks dashboard
+  async getRestaurantFeedbackStats() {
+    const [totalFeedbacks, pendingCount, repliedCount, averageRating] =
+      await Promise.all([
+        this.restaurantFeedback.countDocuments().exec(), // total
+        this.restaurantFeedback.countDocuments({ status: "pending" }).exec(),
+        this.restaurantFeedback.countDocuments({ status: "replied" }).exec(),
+        this.getRestaurantAverageRating(),
+      ]);
+  
+    return {
+      totalFeedbacks,
+      pendingCount,
+      repliedCount,
+      averageRating,
+    };
+  }
+  
+
+
 
 //get the newest 5 feedbacks 
 async getRecentRestaurantFeedbacks() {
@@ -300,10 +320,22 @@ async getRecentItemFeedbacks(menuItemId: string) {
   }
   
 
-  async deleteRestaurantFeedback(feedbackId: string): Promise<boolean> {
-    const result = await this.restaurantFeedback.findByIdAndDelete(feedbackId);
-    return !!result;
+  
+// Delete a restaurant feedback by ID
+async deleteRestaurantFeedback(feedbackId: string): Promise<{ success: boolean; message: string }> {
+  if (!Types.ObjectId.isValid(feedbackId)) {
+    return { success: false, message: 'Invalid feedback ID' };
   }
+
+  const deleted = await this.restaurantFeedback.findByIdAndDelete(feedbackId);
+
+  if (!deleted) {
+    return { success: false, message: 'Feedback not found or already deleted' };
+  }
+
+  return { success: true, message: 'Feedback deleted successfully' };
+}
+
   
   async deleteItemFeedback(feedbackId: string): Promise<boolean> {
     const result = await this.itemFeedback.findByIdAndDelete(feedbackId);
@@ -314,4 +346,5 @@ async getRecentItemFeedbacks(menuItemId: string) {
   
 
 }
+
 

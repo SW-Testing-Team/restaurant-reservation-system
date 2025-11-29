@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Star, Clock, CheckCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 function AdminRestaurantFeedbacks() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -16,6 +17,14 @@ function AdminRestaurantFeedbacks() {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
+
+  const [stats, setStats] = useState({
+    totalFeedbacks: 0,
+    pendingCount: 0,
+    repliedCount: 0,
+    averageRating: 0,
+  });
+
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
@@ -27,8 +36,23 @@ function AdminRestaurantFeedbacks() {
         setLoading(false);
       }
     };
+
+
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/feedback/restaurant/stats`);
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
+      }
+    };
+
     fetchFeedbacks();
+    fetchStats()
   }, []);
+
+  const { totalFeedbacks, pendingCount, repliedCount, averageRating } = stats;
+
 
   if (loading) return <p className="p-8 text-center text-gray-500">Loading...</p>;
   if (error) return <p className="p-8 text-center text-red-600">{error.message}</p>;
@@ -78,11 +102,24 @@ function AdminRestaurantFeedbacks() {
     }
   };
 
-  const totalFeedbacks = feedbacks.length;
-  const pendingCount = feedbacks.filter((f) => f.status === "pending").length;
-  const repliedCount = feedbacks.filter((f) => f.status === "replied").length;
-  const averageRating =
-    feedbacks.reduce((sum, f) => sum + f.rating, 0) / totalFeedbacks || 0;
+
+const handleDelete = async (feedbackId) => {
+  if (!confirm("Are you sure you want to delete this feedback?")) return;
+
+  try {
+    await axios.delete(`${API_URL}/feedback/restaurant/${feedbackId}`, {
+      withCredentials: true,
+    });
+
+    // Remove deleted feedback from state
+    setFeedbacks((prev) => prev.filter((fb) => fb._id !== feedbackId));
+    alert("Feedback deleted successfully");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete feedback");
+  }
+};
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -128,8 +165,8 @@ function AdminRestaurantFeedbacks() {
         <div className="bg-gradient-to-r from-teal-50 to-teal-100 text-gray-800 rounded-2xl shadow-lg p-6 flex flex-col items-center transition transform hover:scale-105">
           <Star className="h-8 w-8 mb-2 text-teal-600" />
           <span className="text-sm opacity-90">Avg Rating</span>
-          <span className="text-3xl font-bold">{averageRating.toFixed(1)}</span>
-        </div>
+          <span className="text-3xl font-bold">{(averageRating || 0).toFixed(1)}</span>
+          </div>
       </div>
 
       {/* Controls */}
@@ -203,14 +240,17 @@ function AdminRestaurantFeedbacks() {
                 <td className="px-4 py-2 whitespace-normal max-w-[300px] break-words">
                   <p className="text-gray-700">{fb.message}</p>
                 </td>
-                <td className="px-4 py-2 flex items-center gap-1">
-                  {[...Array(fb.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-500" />
-                  ))}
-                  {[...Array(5 - fb.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-gray-300" />
-                  ))}
+                <td className="px-4 py-2">
+                  <div className="flex items-center justify-center gap-1 h-full">
+                    {[...Array(fb.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-500" />
+                    ))}
+                    {[...Array(5 - fb.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-gray-300" />
+                    ))}
+                  </div>
                 </td>
+
                 <td className="px-4 py-2 whitespace-nowrap">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -222,24 +262,37 @@ function AdminRestaurantFeedbacks() {
                     {fb.status.charAt(0).toUpperCase() + fb.status.slice(1)}
                   </span>
                 </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm">{new Date(fb.date).toLocaleDateString()}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-sm">{fb.date ? new Date(fb.date).toLocaleDateString() : "-"}</td>
                 <td className="px-4 py-2 whitespace-normal max-w-[250px]">
                   <p className="text-gray-700 text-sm">{fb.reply || "-"}</p>
                 </td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm">{fb.adminId?.name || "-"}</td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm">{fb.replyDate ? new Date(fb.replyDate).toLocaleString() : "-"}</td>
-                <td className="px-4 py-2 whitespace-nowrap sticky right-0 bg-white border-l border-gray-200 z-10">
-                  <button
-                    className="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition text-sm shadow-sm w-full"
-                    onClick={() => {
-                      setCurrentFeedback(fb);
-                      setModalOpen(true);
-                      setReplyMessage(fb.reply || "");
-                    }}
-                  >
-                    Reply
-                  </button>
-                </td>
+                <td className="px-4 py-2 sticky right-0 bg-white border-l border-gray-200 z-10">
+  <div className="flex items-center justify-center gap-2 h-full">
+    {/* Reply Button */}
+    <button
+      className="bg-indigo-600 text-white px-2 py-1 rounded-lg hover:bg-indigo-700 transition text-xs shadow-sm"
+      onClick={() => {
+        setCurrentFeedback(fb);
+        setModalOpen(true);
+        setReplyMessage(fb.reply || "");
+      }}
+    >
+      Reply
+    </button>
+
+    {/* Delete Icon Button */}
+    <button
+      className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition shadow-sm"
+      onClick={() => handleDelete(fb._id)}
+      title="Delete Feedback"
+    >
+      <Trash2 className="h-4 w-4" />
+    </button>
+  </div>
+</td>
+
               </tr>
             ))}
           </tbody>
@@ -292,3 +345,4 @@ function AdminRestaurantFeedbacks() {
 }
 
 export default AdminRestaurantFeedbacks;
+

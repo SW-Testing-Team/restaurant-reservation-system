@@ -58,6 +58,12 @@ async getRestaurantFeedbackCount() {
   return this.feedbackService.getRestaurantFeedbackCount();
 }
 
+@Get('restaurant/stats')
+async getRestaurantFeedbackStats() {
+  return this.feedbackService.getRestaurantFeedbackStats();
+}
+
+
 
 
 @Get('restaurantFeedbacks/recent')
@@ -186,5 +192,6 @@ async deleteItemFeedback(@Param('id') feedbackId: string) {
 
 
   }
+
 
 
