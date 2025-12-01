@@ -1,11 +1,12 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
+import { API_URL } from "../config/api";
 
 function Profile() {
   const { user } = useContext(AuthContext);
 
   const handleLogout = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+    await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -50,7 +51,7 @@ function Profile() {
         </div>
 
         {/* Buttons side-by-side */}
-        <div className="flex gap-4 mt-8">
+        <div className="flex gap-4 mt-4">
           <a
             href="/home"
             className="flex-1 text-center bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition"

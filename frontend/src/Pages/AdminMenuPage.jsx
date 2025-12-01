@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Edit2, Trash2, X, Save } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { API_URL } from "../config/api";
 
 function AdminMenuPage() {
   const [menus, setMenus] = useState([]);
@@ -34,7 +35,7 @@ function AdminMenuPage() {
   const fetchMenus = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3000/menu");
+      const response = await axios.get(`${API_URL}/menu`);
       setMenus(response.data);
     } catch (err) {
       setError(err.message);
@@ -50,7 +51,7 @@ function AdminMenuPage() {
   // Menu CRUD operations
   const handleCreateMenu = async () => {
     try {
-      await axios.post("http://localhost:3000/menu", {
+      await axios.post(`${API_URL}/menu`, {
         title: menuForm.title,
         description: menuForm.description,
       });
@@ -63,7 +64,7 @@ function AdminMenuPage() {
 
   const handleUpdateMenu = async () => {
     try {
-      await axios.put(`http://localhost:3000/menu/${menuForm._id}`, {
+      await axios.put(`${API_URL}/menu/${menuForm._id}`, {
         title: menuForm.title,
         description: menuForm.description,
       });
@@ -78,7 +79,7 @@ function AdminMenuPage() {
     if (!window.confirm("Are you sure you want to delete this menu?")) return;
 
     try {
-      await axios.delete(`http://localhost:3000/menu/${menuId}`);
+      await axios.delete(`${API_URL}/menu/${menuId}`);
       fetchMenus();
     } catch (err) {
       alert("Error deleting menu: " + err.message);
@@ -88,7 +89,7 @@ function AdminMenuPage() {
   // Menu Item CRUD operations
   const handleCreateItem = async () => {
     try {
-      await axios.post(`http://localhost:3000/menu/${itemForm.menuId}/items`, {
+      await axios.post(`${API_URL}/menu/${itemForm.menuId}/items`, {
         name: itemForm.name,
         desc: itemForm.desc,
         price: parseFloat(itemForm.price),
@@ -106,7 +107,7 @@ function AdminMenuPage() {
   const handleUpdateItem = async () => {
     try {
       await axios.put(
-        `http://localhost:3000/menu/${itemForm.menuId}/items/${itemForm._id}`,
+        `${API_URL}/menu/${itemForm.menuId}/items/${itemForm._id}`,
         {
           name: itemForm.name,
           desc: itemForm.desc,
@@ -128,7 +129,7 @@ function AdminMenuPage() {
 
     try {
       await axios.delete(
-        `http://localhost:3000/menu/${menuId}/items/${itemId}`
+        `${API_URL}/menu/${menuId}/items/${itemId}`
       );
       fetchMenus();
     } catch (err) {
