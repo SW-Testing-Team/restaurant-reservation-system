@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { CalendarDays, ShoppingBag, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
+import {
+  CalendarDays,
+  ShoppingBag,
+  DollarSign,
+  TrendingUp,
+  BarChart3,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -11,7 +17,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Navbar from "../components/Navbar";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -96,7 +102,9 @@ function AdminDashboard() {
             <div className="bg-red-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <BarChart3 className="h-8 w-8 text-red-600" />
             </div>
-            <p className="text-red-600 text-xl font-semibold mb-2">Error Loading Dashboard</p>
+            <p className="text-red-600 text-xl font-semibold mb-2">
+              Error Loading Dashboard
+            </p>
             <p className="text-gray-500 mb-6">{error}</p>
             <button
               onClick={() => window.location.reload()}
@@ -122,7 +130,9 @@ function AdminDashboard() {
             <div className="bg-red-600 p-2 rounded-lg">
               <BarChart3 className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Admin Dashboard
+            </h1>
           </div>
           <p className="text-gray-600 ml-12">
             Administrator overview of restaurant performance and analytics
@@ -265,8 +275,12 @@ function AdminDashboard() {
               ) : (
                 <div className="h-80 flex flex-col items-center justify-center bg-gray-50 rounded-xl">
                   <BarChart3 className="h-16 w-16 text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-lg font-medium">No order data available yet</p>
-                  <p className="text-gray-400 text-sm mt-1">Place some orders to see the chart</p>
+                  <p className="text-gray-500 text-lg font-medium">
+                    No order data available yet
+                  </p>
+                  <p className="text-gray-400 text-sm mt-1">
+                    Place some orders to see the chart
+                  </p>
                 </div>
               )}
             </div>
@@ -309,12 +323,17 @@ function AdminDashboard() {
                           className="hover:bg-gray-50 transition-colors duration-150"
                         >
                           <td className="py-4 px-4">
-                            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
-                              index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                              index === 1 ? 'bg-gray-200 text-gray-700' :
-                              index === 2 ? 'bg-orange-100 text-orange-700' :
-                              'bg-red-100 text-red-600'
-                            }`}>
+                            <span
+                              className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
+                                index === 0
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : index === 1
+                                  ? "bg-gray-200 text-gray-700"
+                                  : index === 2
+                                  ? "bg-orange-100 text-orange-700"
+                                  : "bg-red-100 text-red-600"
+                              }`}
+                            >
                               {index + 1}
                             </span>
                           </td>

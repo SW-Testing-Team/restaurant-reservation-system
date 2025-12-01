@@ -3,7 +3,7 @@ import { AuthContext } from "../context/authContext";
 import { Menu, X, ChefHat } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Navbar = () => {
   const { user, loading } = useContext(AuthContext);
@@ -110,7 +110,10 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex space-x-6 items-center">
-            <a href="/home" className={`whitespace-nowrap ${getNavLinkClass("home")}`}>
+            <a
+              href="/home"
+              className={`whitespace-nowrap ${getNavLinkClass("home")}`}
+            >
               Home
             </a>
 
@@ -133,13 +136,17 @@ const Navbar = () => {
               <>
                 <a
                   href="/reservations"
-                  className={`whitespace-nowrap ${getNavLinkClass("reservations")}`}
+                  className={`whitespace-nowrap ${getNavLinkClass(
+                    "reservations"
+                  )}`}
                 >
                   Reservations
                 </a>
                 <a
                   href="/my-reservations"
-                  className={`whitespace-nowrap ${getNavLinkClass("my-reservations")}`}
+                  className={`whitespace-nowrap ${getNavLinkClass(
+                    "my-reservations"
+                  )}`}
                 >
                   My Bookings
                 </a>
@@ -185,16 +192,13 @@ const Navbar = () => {
                       Menu Management
                     </a>
 
-
                     <a
-                    href="/admin/restaurantFeedbacks"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
-                    onClick={handleAdminLinkClick}
-                  >
-                    View All Feedbacks
-                  </a>
-
-
+                      href="/admin/restaurantFeedbacks"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
+                      onClick={handleAdminLinkClick}
+                    >
+                      View All Feedbacks
+                    </a>
                   </div>
                 )}
               </div>
@@ -230,7 +234,10 @@ const Navbar = () => {
                   </button>
                 )}
 
-                <a href="/profile" className={`whitespace-nowrap ${getNavLinkClass("profile")}`}>
+                <a
+                  href="/profile"
+                  className={`whitespace-nowrap ${getNavLinkClass("profile")}`}
+                >
                   Profile
                 </a>
                 <button

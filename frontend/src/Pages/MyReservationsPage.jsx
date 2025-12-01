@@ -15,7 +15,7 @@ import {
 import Navbar from "../components/Navbar";
 import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const MyReservations = () => {
   const { user } = useContext(AuthContext);
