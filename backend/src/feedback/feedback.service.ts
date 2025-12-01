@@ -41,10 +41,15 @@ async createRestaurantFeedback(userId: string, message: string, rating: number) 
 
 //returns all the feedbacks 
 async getAllRestaurantFeedbacks() {
-    // Fetch all feedbacks, sorted by newest first
-    return this.restaurantFeedback.find().sort({ date: -1 }).exec();
-  }
-  
+  return this.restaurantFeedback
+    .find()
+    .sort({ date: -1 })
+    .populate('userId', 'name email role phone')    // only select relevant user fields
+    .populate('adminId', 'name email role phone')   // only select relevant admin fields
+    .exec();
+}
+
+
 
 //admin reply to a feedback
 async replyRestaurantFeedback(
@@ -95,28 +100,50 @@ async getRestaurantFeedbackCount(): Promise<number> {
   }
 
 
+//it return the stats for the admin feedbacks dashboard
+  async getRestaurantFeedbackStats() {
+    const [totalFeedbacks, pendingCount, repliedCount, averageRating] =
+      await Promise.all([
+        this.restaurantFeedback.countDocuments().exec(), // total
+        this.restaurantFeedback.countDocuments({ status: "pending" }).exec(),
+        this.restaurantFeedback.countDocuments({ status: "replied" }).exec(),
+        this.getRestaurantAverageRating(),
+      ]);
+  
+    return {
+      totalFeedbacks,
+      pendingCount,
+      repliedCount,
+      averageRating,
+    };
+  }
+  
+
+
 
 //get the newest 5 feedbacks 
-    async getRecentRestaurantFeedbacks() {
-    return this.restaurantFeedback
-      .find({}, { rating: 1, message: 1, date: 1 })
-      .populate('userId', 'username profilePicture')
-      .sort({ date: -1 })
-      .limit(5)
-      .lean()
-      .exec()
-      .then(feedbacks =>
-        feedbacks.map(fb => {
-          const user = fb.userId as unknown as populatedUser;
-          return {
-            username: user.name,
-            rating: fb.rating,
-            message: fb.message,
-            date: fb.date,
-          };
-        })
-      );
-  }
+async getRecentRestaurantFeedbacks() {
+  return this.restaurantFeedback
+    .find()                         // remove { rating: 1, message: 1, date: 1 }
+    .populate('userId', 'name')     // select only the name from User
+    .sort({ date: -1 })
+    .limit(5)
+    .lean()
+    .exec()
+    .then(feedbacks =>
+      feedbacks.map(fb => {
+        const user = fb.userId as unknown as populatedUser;
+        return {
+          username: user?.name || 'Anonymous', // fallback
+          rating: fb.rating,
+          message: fb.message,
+          date: fb.date,
+        };
+      })
+    );
+}
+
+
   
       
   //get all feedbacks sorted by date
@@ -124,8 +151,14 @@ async getRestaurantFeedbackCount(): Promise<number> {
     return this.restaurantFeedback
       .find()
       .sort({ date: -1 })
+  
+      .populate('userId', 'name email phone')
+      .populate('adminId', 'name email phone')
+
+      .lean() // convert to plain JS objects
       .exec();
   }
+  
   
 
   
@@ -287,10 +320,22 @@ async getRecentItemFeedbacks(menuItemId: string) {
   }
   
 
-  async deleteRestaurantFeedback(feedbackId: string): Promise<boolean> {
-    const result = await this.restaurantFeedback.findByIdAndDelete(feedbackId);
-    return !!result;
+  
+// Delete a restaurant feedback by ID
+async deleteRestaurantFeedback(feedbackId: string): Promise<{ success: boolean; message: string }> {
+  if (!Types.ObjectId.isValid(feedbackId)) {
+    return { success: false, message: 'Invalid feedback ID' };
   }
+
+  const deleted = await this.restaurantFeedback.findByIdAndDelete(feedbackId);
+
+  if (!deleted) {
+    return { success: false, message: 'Feedback not found or already deleted' };
+  }
+
+  return { success: true, message: 'Feedback deleted successfully' };
+}
+
   
   async deleteItemFeedback(feedbackId: string): Promise<boolean> {
     const result = await this.itemFeedback.findByIdAndDelete(feedbackId);
@@ -301,4 +346,5 @@ async getRecentItemFeedbacks(menuItemId: string) {
   
 
 }
+
 
