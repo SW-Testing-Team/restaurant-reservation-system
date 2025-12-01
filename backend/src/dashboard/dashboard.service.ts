@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { Reservation } from '../reservations/models/reservation.schema';
 import { Order } from '../menu-order/models/Order.schema';
 import { MenuItem } from '../menu-order/models/MenuItem.schema';
+import { RestaurantFeedback } from '../feedback/schemas/restaurant-feedback.schema';
+import { ItemFeedback } from '../feedback/schemas/menu-item-feedback.schema';
 
 @Injectable()
 export class DashboardService {
@@ -14,6 +16,10 @@ export class DashboardService {
     private orderModel: Model<Order>,
     @InjectModel(MenuItem.name)
     private menuItemModel: Model<MenuItem>,
+    @InjectModel(RestaurantFeedback.name)
+    private restaurantFeedbackModel: Model<RestaurantFeedback>,
+    @InjectModel(ItemFeedback.name)
+    private itemFeedbackModel: Model<ItemFeedback>,
   ) {}
 
   async getStatistics() {
@@ -74,11 +80,80 @@ export class DashboardService {
       },
     ]);
 
+    // Get feedback statistics
+    const totalRestaurantFeedback = await this.restaurantFeedbackModel.countDocuments();
+    const totalItemFeedback = await this.itemFeedbackModel.countDocuments();
+    const totalFeedback = totalRestaurantFeedback + totalItemFeedback;
+
+    // Get average rating from restaurant feedback
+    const restaurantRatingResult = await this.restaurantFeedbackModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: '$rating' },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const restaurantAverageRating =
+      restaurantRatingResult.length > 0 && restaurantRatingResult[0].count > 0
+        ? restaurantRatingResult[0].averageRating
+        : 0;
+
+    // Get average rating from item feedback
+    const itemRatingResult = await this.itemFeedbackModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: '$rating' },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const itemAverageRating =
+      itemRatingResult.length > 0 && itemRatingResult[0].count > 0
+        ? itemRatingResult[0].averageRating
+        : 0;
+
+    // Calculate overall average rating
+    const overallAverageRating =
+      totalFeedback > 0
+        ? (restaurantAverageRating * totalRestaurantFeedback +
+            itemAverageRating * totalItemFeedback) /
+          totalFeedback
+        : 0;
+
+    // Get pending feedback count (unreplied)
+    const pendingRestaurantFeedback = await this.restaurantFeedbackModel.countDocuments({
+      status: 'pending',
+    });
+    const pendingItemFeedback = await this.itemFeedbackModel.countDocuments({
+      status: 'pending',
+    });
+    const totalPendingFeedback = pendingRestaurantFeedback + pendingItemFeedback;
+
+    // Get replied feedback count
+    const repliedRestaurantFeedback = await this.restaurantFeedbackModel.countDocuments({
+      status: 'replied',
+    });
+    const repliedItemFeedback = await this.itemFeedbackModel.countDocuments({
+      status: 'replied',
+    });
+    const totalRepliedFeedback = repliedRestaurantFeedback + repliedItemFeedback;
+
     return {
       totalReservations,
       totalOrders,
       totalRevenue,
       topMenuItems,
+      feedbackSummary: {
+        totalFeedback,
+        averageRating: Math.round(overallAverageRating * 10) / 10, // Round to 1 decimal
+        pendingFeedback: totalPendingFeedback,
+        repliedFeedback: totalRepliedFeedback,
+        restaurantFeedback: totalRestaurantFeedback,
+        itemFeedback: totalItemFeedback,
+      },
     };
   }
 }
