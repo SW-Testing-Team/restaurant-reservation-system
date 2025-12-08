@@ -4,6 +4,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { Star, Clock, MapPin, Phone, ChefHat } from "lucide-react"; // icons
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Homepage() {
   const { user, loading } = useContext(AuthContext);
@@ -44,7 +45,7 @@ function Homepage() {
     const fetchFeedbacks = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:3000/feedback/restaurantFeedbacks/recent"
+          `${API_URL}/feedback/restaurantFeedbacks/recent`
         );
         setFeedbacks(res.data);
       } catch (err) {
@@ -65,7 +66,7 @@ function Homepage() {
       setSubmitting(true);
 
       await axios.post(
-        "http://localhost:3000/feedback/addRestaurantFeedback",
+        `${API_URL}/feedback/addRestaurantFeedback`,
         {
           message: newMessage,
           rating: newRating,
@@ -82,7 +83,7 @@ function Homepage() {
 
       // Refresh list
       const res = await axios.get(
-        "http://localhost:3000/feedback/restaurantFeedbacks/recent"
+        `${API_URL}/feedback/restaurantFeedbacks/recent`
       );
       setFeedbacks(res.data);
     } catch (err) {

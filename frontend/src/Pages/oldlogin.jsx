@@ -1,3 +1,4 @@
+// THIS FILE IS DEPRECATED - DO NOT USE
 import { useState } from "react";
 
 const API = "http://localhost:3000/auth"; // your backend URL

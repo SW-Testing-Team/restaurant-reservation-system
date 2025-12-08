@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Star, Clock, CheckCircle } from "lucide-react";
 import { Trash2 } from "lucide-react";
+import { API_URL } from "../config/api";
 
 function AdminRestaurantFeedbacks() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -14,9 +15,6 @@ function AdminRestaurantFeedbacks() {
   const [currentFeedback, setCurrentFeedback] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
-
-  const API_URL = import.meta.env.VITE_API_URL;
-
 
   const [stats, setStats] = useState({
     totalFeedbacks: 0,

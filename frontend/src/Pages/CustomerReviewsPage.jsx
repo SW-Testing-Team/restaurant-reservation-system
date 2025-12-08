@@ -3,6 +3,7 @@ import axios from "axios";
 import { Star, ChevronLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 export default function CustomerAllReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -12,7 +13,7 @@ export default function CustomerAllReviewsPage() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/feedback/restaurantFeedbacks/sorted-feedbacks")
+      .get(`${API_URL}/feedback/restaurantFeedbacks/sorted-feedbacks`)
       .then((res) => setReviews(res.data))
       .catch((err) => setError(err))
       .finally(() => setLoading(false));

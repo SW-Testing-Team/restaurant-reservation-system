@@ -3,7 +3,7 @@ import { ChefHat, Plus, Minus, Trash2, ShoppingCart, X } from "lucide-react";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../config/api";
 
 function OrderPage() {
   const [cart, setCart] = useState([]);

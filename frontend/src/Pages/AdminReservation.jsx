@@ -16,7 +16,7 @@ import {
   Filter,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../config/api";
 
 const AdminReservation = () => {
   const { user } = useContext(AuthContext);

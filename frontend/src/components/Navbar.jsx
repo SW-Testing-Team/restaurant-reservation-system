@@ -3,7 +3,7 @@ import { AuthContext } from "../context/authContext";
 import { Menu, X, ChefHat } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../config/api";
 
 const Navbar = () => {
   const { user, loading } = useContext(AuthContext);
