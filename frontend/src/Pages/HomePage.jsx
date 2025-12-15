@@ -4,8 +4,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { Star, Clock, MapPin, Phone, ChefHat } from "lucide-react"; // icons
 import { Link } from "react-router-dom";
-
-
+import { API_URL } from "../config/api";
 
 function Homepage() {
   const { user, loading } = useContext(AuthContext);
@@ -13,7 +12,7 @@ function Homepage() {
   const [error, setError] = useState(null);
 
   const handleLogout = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+    await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -23,7 +22,7 @@ function Homepage() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/menu");
+        const response = await axios.get(`${API_URL}/menu`);
         setMenu(response.data);
       } catch (err) {
         setError(err);
@@ -33,98 +32,93 @@ function Homepage() {
     fetchMenu();
   }, []);
 
+  //for the feedbacks section
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbackError, setFeedbackError] = useState(null);
+  // Add Review Form States
+  const [showForm, setShowForm] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [newRating, setNewRating] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
 
-//for the feedbacks section
-const [feedbacks, setFeedbacks] = useState([]);
-const [feedbackError, setFeedbackError] = useState(null);
-// Add Review Form States
-const [showForm, setShowForm] = useState(false);
-const [newMessage, setNewMessage] = useState("");
-const [newRating, setNewRating] = useState(0);
-const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const res = await axios.get(
+          `${API_URL}/feedback/restaurantFeedbacks/recent`
+        );
+        setFeedbacks(res.data);
+      } catch (err) {
+        console.error(err);
+        setFeedbackError(err);
+      }
+    };
+    fetchFeedbacks();
+  }, []);
 
+  const handleSubmitFeedback = async () => {
+    if (!newMessage || newRating === 0) {
+      alert("Please write a review and select a rating.");
+      return;
+    }
 
-
-useEffect(() => {
-  const fetchFeedbacks = async () => {
     try {
+      setSubmitting(true);
+
+      await axios.post(
+        `${API_URL}/feedback/addRestaurantFeedback`,
+        {
+          message: newMessage,
+          rating: newRating,
+        },
+        { withCredentials: true }
+      );
+
+      alert("Review added successfully!");
+
+      // Reset fields
+      setNewMessage("");
+      setNewRating(0);
+      setShowForm(false);
+
+      // Refresh list
       const res = await axios.get(
-        "http://localhost:3000/feedback/restaurantFeedbacks/recent"
+        `${API_URL}/feedback/restaurantFeedbacks/recent`
       );
       setFeedbacks(res.data);
     } catch (err) {
       console.error(err);
-      setFeedbackError(err);
+      alert("Error submitting review.");
+    } finally {
+      setSubmitting(false);
     }
   };
-  fetchFeedbacks();
-}, []);
 
-
-
-
-const handleSubmitFeedback = async () => {
-  if (!newMessage || newRating === 0) {
-    alert("Please write a review and select a rating.");
-    return;
-  }
-
-  try {
-    setSubmitting(true);
-    
-    await axios.post(
-      "http://localhost:3000/feedback/addRestaurantFeedback",
-      {
-        message: newMessage,
-        rating: newRating,
-      },
-      { withCredentials: true }
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
     );
 
-    alert("Review added successfully!");
-
-    // Reset fields
-    setNewMessage("");
-    setNewRating(0);
-    setShowForm(false);
-
-    // Refresh list
-    const res = await axios.get(
-      "http://localhost:3000/feedback/restaurantFeedbacks/recent"
+  if (error)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-xl">
+            Error fetching menu: {error.message}
+          </p>
+        </div>
+      </div>
     );
-    setFeedbacks(res.data);
-
-  } catch (err) {
-    console.error(err);
-    alert("Error submitting review.");
-  } finally {
-    setSubmitting(false);
-  }
-};
-
-
-
-  if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
-      </div>
-    </div>
-  );
-  
-  if (error) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-red-600 text-xl">Error fetching menu: {error.message}</p>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar currentPage="home" />
-      
+
       {/* Hero Section */}
       <section
         id="home"
@@ -143,11 +137,10 @@ const handleSubmitFeedback = async () => {
             </button>
           </a>
 
-
-        <a href="#top-rated">
-        {   
-       <button
-       className="
+          <a href="#top-rated">
+            {
+              <button
+                className="
          ml-4
          mt-5 px-6 py-3 rounded-full
          text-white text-lg font-medium
@@ -157,13 +150,11 @@ const handleSubmitFeedback = async () => {
          backdrop-blur-sm
          border border-white/30
        "
-     >
-       ⭐️View Our Top Rated Items
-     </button>
-     
-      
-      }
-      </a>
+              >
+                ⭐️View Our Top Rated Items
+              </button>
+            }
+          </a>
         </div>
       </section>
 
@@ -232,156 +223,163 @@ const handleSubmitFeedback = async () => {
         </div>
       </section>
 
+      <section
+        id="recent-feedback"
+        className="py-16 bg-gradient-to-b from-red-50 via-white to-red-50"
+      >
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-red-600 tracking-wide leading-tight">
+            Flavors, Smiles & Stories:
+            <span className="text-red-700">Our Guests Speak</span>
+          </h2>
 
-      <section id="recent-feedback" className="py-16 bg-gradient-to-b from-red-50 via-white to-red-50">
-  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-red-600 tracking-wide leading-tight">
-      Flavors, Smiles & Stories: 
-      <span className="text-red-700">Our Guests Speak</span>
-    </h2>
+          {feedbackError && (
+            <p className="text-red-600 text-center mb-6">
+              Error loading feedbacks
+            </p>
+          )}
 
-    {feedbackError && (
-      <p className="text-red-600 text-center mb-6">
-        Error loading feedbacks
-      </p>
-    )}
+          {feedbacks.length === 0 ? (
+            <p className="text-center text-gray-600">No feedbacks yet.</p>
+          ) : (
+            <div className="space-y-8">
+              {feedbacks.map((fb, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white rounded-3xl shadow-xl p-6 transform hover:-translate-y-1 hover:scale-105 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-4">
+                      <span className="font-semibold text-lg text-red-700">
+                        {fb.username}
+                      </span>
+                    </div>
+                    <span className="text-gray-400 text-sm">
+                      {new Date(fb.date).toLocaleDateString(undefined, {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
 
-    {feedbacks.length === 0 ? (
-      <p className="text-center text-gray-600">No feedbacks yet.</p>
-    ) : (
-      <div className="space-y-8">
-        {feedbacks.map((fb, idx) => (
-          <div
-            key={idx}
-            className="bg-white rounded-3xl shadow-xl p-6 transform hover:-translate-y-1 hover:scale-105 transition-all duration-300"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-4">
-                <span className="font-semibold text-lg text-red-700">{fb.username}</span>
-              </div>
-              <span className="text-gray-400 text-sm">
-                {new Date(fb.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-              </span>
-            </div>
+                  <div className="flex items-center mb-3">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 mr-1 ${
+                          i < fb.rating ? "text-yellow-400" : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
 
-            <div className="flex items-center mb-3">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star
-                  key={i}
-                  className={`w-5 h-5 mr-1 ${i < fb.rating ? "text-yellow-400" : "text-gray-300"}`}
-                />
+                  <p className="text-gray-700 text-lg mb-3 italic">
+                    "{fb.message}"
+                  </p>
+
+                  {fb.reply && (
+                    <div className="mt-4 p-4 bg-red-50 rounded-2xl border-l-4 border-red-600">
+                      <p className="text-red-700 font-medium">Chef's Reply:</p>
+                      <p className="text-gray-700 text-sm mt-1">{fb.reply}</p>
+                      {fb.replyDate && (
+                        <p className="text-gray-400 text-xs mt-1">
+                          {new Date(fb.replyDate).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
+          )}
 
-            <p className="text-gray-700 text-lg mb-3 italic">"{fb.message}"</p>
-
-            {fb.reply && (
-              <div className="mt-4 p-4 bg-red-50 rounded-2xl border-l-4 border-red-600">
-                <p className="text-red-700 font-medium">Chef's Reply:</p>
-                <p className="text-gray-700 text-sm mt-1">{fb.reply}</p>
-                {fb.replyDate && (
-                  <p className="text-gray-400 text-xs mt-1">
-                    {new Date(fb.replyDate).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    )}
-
-    {/* Buttons */}
-    <div className="mt-12">
-
-      {/* Centered See All Reviews Button */}
-        <div className="flex justify-center mb-8">
-          <Link
-            to="/all-reviews"
-            className="inline-block px-6 py-3 font-semibold rounded-full shadow-lg text-white 
+          {/* Buttons */}
+          <div className="mt-12">
+            {/* Centered See All Reviews Button */}
+            <div className="flex justify-center mb-8">
+              <Link
+                to="/all-reviews"
+                className="inline-block px-6 py-3 font-semibold rounded-full shadow-lg text-white 
                       bg-gradient-to-r from-red-600 to-orange-500 
                       hover:from-red-700 hover:to-orange-600 transition-all duration-300"
-          >
-            See All Reviews
-          </Link>
-        </div>
+              >
+                See All Reviews
+              </Link>
+            </div>
 
+            <div className="mt-12 max-w-2xl mx-auto bg-gradient-to-r from-[#fefcf5] to-[#f7f7f7] rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Text */}
+              <div className="text-center md:text-left">
+                <h3 className="text-2xl md:text-3xl font-semibold text-[#3b4f6b]">
+                  Your Reflections Matter
+                </h3>
+                <p className="mt-1 text-base md:text-lg text-[#5c6d7b]">
+                  A brief review would be sincerely appreciated.{" "}
+                </p>
+              </div>
 
-        <div className="mt-12 max-w-2xl mx-auto bg-gradient-to-r from-[#fefcf5] to-[#f7f7f7] rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-  {/* Text */}
-  <div className="text-center md:text-left">
-    <h3 className="text-2xl md:text-3xl font-semibold text-[#3b4f6b]">
-      Your Reflections Matter
-    </h3>
-    <p className="mt-1 text-base md:text-lg text-[#5c6d7b]">
-    A brief review would be sincerely appreciated.    </p>
-  </div>
-
-  {/* Button */}
-  <button
-    onClick={() => {
-      if (!user) {
-        alert("Please login to add your review.");
-        return;
-      }
-      setShowForm(!showForm);
-    }}
-    className="px-6 py-2 font-semibold rounded-full shadow-md text-white
+              {/* Button */}
+              <button
+                onClick={() => {
+                  if (!user) {
+                    alert("Please login to add your review.");
+                    return;
+                  }
+                  setShowForm(!showForm);
+                }}
+                className="px-6 py-2 font-semibold rounded-full shadow-md text-white
                bg-gradient-to-r from-[#7da9d9] to-[#4d7ea8]
                hover:from-[#6b95c3] hover:to-[#3f6990]
                transition-all duration-300"
-  >
-    📝 Add Your Review
-  </button>
-</div>
+              >
+                📝 Add Your Review
+              </button>
+            </div>
+          </div>
 
+          {showForm && (
+            <div className="mt-10 bg-white p-6 rounded-3xl shadow-xl">
+              <h3 className="text-2xl font-bold text-red-600 mb-4 text-center">
+                Share Your Experience
+              </h3>
 
-    </div>
+              {/* Rating */}
+              <div className="flex justify-center mb-4">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <Star
+                    key={i}
+                    onClick={() => setNewRating(i + 1)}
+                    className={`w-8 h-8 cursor-pointer ${
+                      i < newRating ? "text-yellow-400" : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
 
-    {showForm && (
-      <div className="mt-10 bg-white p-6 rounded-3xl shadow-xl">
-        <h3 className="text-2xl font-bold text-red-600 mb-4 text-center">
-          Share Your Experience
-        </h3>
+              {/* Message Input */}
+              <textarea
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="w-full border border-gray-300 rounded-xl p-4 text-gray-700 focus:ring-2 focus:ring-red-400 focus:outline-none"
+                rows="4"
+                placeholder="Write your review..."
+              ></textarea>
 
-        {/* Rating */}
-        <div className="flex justify-center mb-4">
-          {Array.from({ length: 5 }, (_, i) => (
-            <Star
-              key={i}
-              onClick={() => setNewRating(i + 1)}
-              className={`w-8 h-8 cursor-pointer ${
-                i < newRating ? "text-yellow-400" : "text-gray-300"
-              }`}
-            />
-          ))}
+              {/* Submit Button */}
+              <div className="text-center mt-4">
+                <button
+                  disabled={submitting}
+                  onClick={handleSubmitFeedback}
+                  className="px-8 py-3 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 transition disabled:opacity-50"
+                >
+                  {submitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Message Input */}
-        <textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="w-full border border-gray-300 rounded-xl p-4 text-gray-700 focus:ring-2 focus:ring-red-400 focus:outline-none"
-          rows="4"
-          placeholder="Write your review..."
-        ></textarea>
-
-        {/* Submit Button */}
-        <div className="text-center mt-4">
-          <button
-            disabled={submitting}
-            onClick={handleSubmitFeedback}
-            className="px-8 py-3 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 transition disabled:opacity-50"
-          >
-            {submitting ? "Submitting..." : "Submit Review"}
-          </button>
-        </div>
-      </div>
-    )}
-
-  </div>
-</section>
-
+      </section>
 
       {/* About Section */}
       <section id="about" className="py-16 bg-white">

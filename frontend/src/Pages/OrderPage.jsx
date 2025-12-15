@@ -3,6 +3,7 @@ import { ChefHat, Plus, Minus, Trash2, ShoppingCart, X } from "lucide-react";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
+import { API_URL } from "../config/api";
 
 function OrderPage() {
   const [cart, setCart] = useState([]);
@@ -18,7 +19,7 @@ function OrderPage() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/menu");
+        const response = await axios.get(`${API_URL}/menu`);
         setMenu(response.data);
       } catch (err) {
         setError(err);
@@ -82,7 +83,7 @@ function OrderPage() {
       return;
     }
     console.log("cart", cart);
-    axios.post("http://localhost:3000/orders", {
+    axios.post(`${API_URL}/orders`, {
       userId: user.id, //Replace with actual user ID
       type: orderType,
       items: cart.map((item) => ({

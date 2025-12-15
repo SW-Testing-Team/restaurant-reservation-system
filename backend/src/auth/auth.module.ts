@@ -16,22 +16,24 @@ import { CounterSchema } from 'src/common/schemas/counter.schema';
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => {
-            const expires = config.get<string>('JWT_EXPIRES_IN');
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const expires = config.get<string>('JWT_EXPIRES_IN');
+        // Use environment variable or fallback to default for development
+        const secret = config.get<string>('JWT_SECRET') || 'verysecretkey123';
 
-            return {
-            secret: config.get<string>('JWT_SECRET'),
-            signOptions: {
-                expiresIn: expires ? Number(expires) : 86400, // force number
-            },
-            };
-        },
+        return {
+          secret: secret,
+          signOptions: {
+            expiresIn: expires ? Number(expires) : 86400, // force number
+          },
+        };
+      },
     }),
     MongooseModule.forFeature([
-        { name: User.name, schema: UserSchema },
-        { name: 'Counter', schema: CounterSchema },
+      { name: User.name, schema: UserSchema },
+      { name: 'Counter', schema: CounterSchema },
     ]),
   ],
   controllers: [AuthController],

@@ -2,9 +2,9 @@ import React, { useState, useContext } from "react";
 import { Mail, Lock, ChefHat } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 const Login = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);

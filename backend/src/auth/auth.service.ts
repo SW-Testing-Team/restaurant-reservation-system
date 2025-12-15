@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
@@ -49,7 +54,8 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    if (!email || !password) throw new BadRequestException('Email and password required');
+    if (!email || !password)
+      throw new BadRequestException('Email and password required');
 
     const user = await this.authRepo.findByEmail(email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
@@ -78,7 +84,10 @@ export class AuthService {
 
   //admin: list users
   async listUsers() {
-    return (await (this.authRepo as any).userModel.find().select('-password').exec());
+    return (await (this.authRepo as any).userModel
+      .find()
+      .select('-password')
+      .exec()) as unknown[];
   }
 
   private signToken(userId: string) {

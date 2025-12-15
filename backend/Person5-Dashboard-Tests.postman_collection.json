@@ -1,0 +1,330 @@
+{
+	"info": {
+		"_postman_id": "person5-dashboard-tests",
+		"name": "Person 5 - Dashboard Tests",
+		"description": "Complete test collection for Person 5's Dashboard, Analytics & Deployment work",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Login as Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Save the token cookie for subsequent requests",
+							"const cookies = pm.cookies.toObject();",
+							"if (cookies.token) {",
+							"    pm.environment.set('auth_token', cookies.token);",
+							"    console.log('Token saved:', cookies.token.substring(0, 20) + '...');",
+							"}",
+							"",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has user data', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"    pm.expect(jsonData.data).to.have.property('role');",
+							"    pm.expect(jsonData.data.role).to.eql('admin');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"admin@bellavista.com\",\n    \"password\": \"Admin123!\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "Login as admin to get authentication token. The token will be saved as a cookie automatically."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Dashboard Statistics",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test response structure",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has all required fields', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('totalReservations');",
+							"    pm.expect(jsonData).to.have.property('totalOrders');",
+							"    pm.expect(jsonData).to.have.property('totalRevenue');",
+							"    pm.expect(jsonData).to.have.property('topMenuItems');",
+							"    pm.expect(jsonData).to.have.property('feedbackSummary');",
+							"});",
+							"",
+							"pm.test('Total Reservations is a number', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.totalReservations).to.be.a('number');",
+							"});",
+							"",
+							"pm.test('Total Orders is a number', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.totalOrders).to.be.a('number');",
+							"});",
+							"",
+							"pm.test('Total Revenue is a number', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.totalRevenue).to.be.a('number');",
+							"});",
+							"",
+							"pm.test('Top Menu Items is an array', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.topMenuItems).to.be.an('array');",
+							"    pm.expect(jsonData.topMenuItems.length).to.be.at.most(5);",
+							"});",
+							"",
+							"pm.test('Feedback Summary has all required fields', function () {",
+							"    const jsonData = pm.response.json();",
+							"    const feedback = jsonData.feedbackSummary;",
+							"    pm.expect(feedback).to.have.property('totalFeedback');",
+							"    pm.expect(feedback).to.have.property('averageRating');",
+							"    pm.expect(feedback).to.have.property('pendingFeedback');",
+							"    pm.expect(feedback).to.have.property('repliedFeedback');",
+							"    pm.expect(feedback).to.have.property('restaurantFeedback');",
+							"    pm.expect(feedback).to.have.property('itemFeedback');",
+							"});",
+							"",
+							"pm.test('Top Menu Items have correct structure', function () {",
+							"    const jsonData = pm.response.json();",
+							"    if (jsonData.topMenuItems.length > 0) {",
+							"        const item = jsonData.topMenuItems[0];",
+							"        pm.expect(item).to.have.property('menuItem');",
+							"        pm.expect(item).to.have.property('orderCount');",
+							"        pm.expect(item.menuItem).to.have.property('name');",
+							"        pm.expect(item.menuItem).to.have.property('price');",
+							"        pm.expect(item.menuItem).to.have.property('category');",
+							"    }",
+							"});",
+							"",
+							"// Log the statistics for manual verification",
+							"const jsonData = pm.response.json();",
+							"console.log('=== Dashboard Statistics ===');",
+							"console.log('Total Reservations:', jsonData.totalReservations);",
+							"console.log('Total Orders:', jsonData.totalOrders);",
+							"console.log('Total Revenue:', jsonData.totalRevenue);",
+							"console.log('Top Menu Items:', jsonData.topMenuItems.length);",
+							"console.log('Total Feedback:', jsonData.feedbackSummary.totalFeedback);",
+							"console.log('Average Rating:', jsonData.feedbackSummary.averageRating);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/dashboard/stats",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"dashboard",
+						"stats"
+					]
+				},
+				"description": "Get dashboard statistics. Requires admin authentication (run Login request first)."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Test Unauthorized Access (No Auth)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// IMPORTANT: You must manually delete cookies in Postman first!",
+							"// Click 'Cookies' button (bottom right) → Delete all cookies for localhost:3000",
+							"",
+							"// Try to clear cookies programmatically",
+							"try {",
+							"    const cookieJar = pm.cookies.jar();",
+							"    cookieJar.unset('http://localhost:3000', 'token', function() {});",
+							"    cookieJar.unset('localhost', 'token', function() {});",
+							"} catch(e) {",
+							"    console.log('Cookie clearing attempted');",
+							"}",
+							"",
+							"// Force remove Cookie header",
+							"pm.request.headers.remove('Cookie');",
+							"",
+							"console.log('⚠️ If you still get 200 OK, manually delete cookies in Postman:');",
+							"console.log('1. Click Cookies button (bottom right)');",
+							"console.log('2. Find localhost:3000');",
+							"console.log('3. Delete all cookies');",
+							"console.log('4. Run this test again');"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if cookies were actually sent",
+							"const requestHeaders = pm.request.headers.toObject();",
+							"const cookieHeader = requestHeaders['Cookie'] || requestHeaders['cookie'];",
+							"",
+							"if (cookieHeader && cookieHeader.includes('token')) {",
+							"    pm.test('⚠️ WARNING: Cookies are still being sent!', function () {",
+							"        console.log('Cookie header found:', cookieHeader);",
+							"        console.log('Please manually delete cookies in Postman and try again');",
+							"        pm.expect.fail('Cookies are still being sent. Delete them manually in Postman.');",
+							"    });",
+							"} else {",
+							"    pm.test('Status code is 401 Unauthorized', function () {",
+							"        pm.response.to.have.status(401);",
+							"    });",
+							"    ",
+							"    if (pm.response.code === 401) {",
+							"        console.log('✓ Security working: Unauthorized access blocked');",
+							"    } else {",
+							"        console.log('✗ Got ' + pm.response.code + ' instead of 401');",
+							"        console.log('This means cookies are still being sent automatically');",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/dashboard/stats",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"dashboard",
+						"stats"
+					]
+				},
+				"description": "⚠️ IMPORTANT: Before running this test, manually delete cookies in Postman (Cookies button → Delete all for localhost:3000). This test should return 401 Unauthorized."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Test Non-Admin Access (403)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// IMPORTANT: You must manually delete cookies in Postman first!",
+							"// Click 'Cookies' button (bottom right) → Delete all cookies for localhost:3000",
+							"",
+							"// Try to clear cookies programmatically",
+							"try {",
+							"    const cookieJar = pm.cookies.jar();",
+							"    cookieJar.unset('http://localhost:3000', 'token', function() {});",
+							"    cookieJar.unset('localhost', 'token', function() {});",
+							"} catch(e) {",
+							"    console.log('Cookie clearing attempted');",
+							"}",
+							"",
+							"// Force remove Cookie header",
+							"pm.request.headers.remove('Cookie');",
+							"",
+							"console.log('⚠️ If you still get 200 OK, manually delete cookies in Postman');"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if cookies were actually sent",
+							"const requestHeaders = pm.request.headers.toObject();",
+							"const cookieHeader = requestHeaders['Cookie'] || requestHeaders['cookie'];",
+							"",
+							"if (cookieHeader && cookieHeader.includes('token')) {",
+							"    pm.test('⚠️ WARNING: Cookies are still being sent!', function () {",
+							"        console.log('Cookie header found:', cookieHeader);",
+							"        console.log('Please manually delete cookies in Postman and try again');",
+							"        pm.expect.fail('Cookies are still being sent. Delete them manually in Postman.');",
+							"    });",
+							"} else {",
+							"    pm.test('Status code is NOT 200 (should be 401 or 403)', function () {",
+							"        pm.expect(pm.response.code).to.not.equal(200);",
+							"    });",
+							"    ",
+							"    if (pm.response.code === 403) {",
+							"        pm.test('Status code is 403 Forbidden (non-admin blocked)', function () {",
+							"            pm.response.to.have.status(403);",
+							"        });",
+							"        console.log('✓ Security working: Non-admin access blocked (403)');",
+							"    } else if (pm.response.code === 401) {",
+							"        pm.test('Status code is 401 Unauthorized (no valid token)', function () {",
+							"            pm.response.to.have.status(401);",
+							"        });",
+							"        console.log('✓ Security working: Unauthorized access blocked (401)');",
+							"    } else {",
+							"        console.log('✗ Got ' + pm.response.code + ' - cookies are still being sent');",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/dashboard/stats",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"dashboard",
+						"stats"
+					]
+				},
+				"description": "⚠️ IMPORTANT: Before running this test, manually delete cookies in Postman (Cookies button → Delete all for localhost:3000). This test should return 401 or 403."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
+

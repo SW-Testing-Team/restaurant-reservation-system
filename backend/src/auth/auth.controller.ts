@@ -1,22 +1,45 @@
-import { Body, Controller, Get, Post, UseGuards, Req, HttpCode, HttpStatus, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Req,
+  HttpCode,
+  HttpStatus,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
-import { CurrentUser } from './decorators/user.decorator';
 import type { Request, Response } from 'express';
 
+interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: string;
+  name: string;
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: AuthenticatedUser;
+}
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   async register(
     @Body() dto: RegisterDto,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
     // return {
     //   success: true,
@@ -25,11 +48,13 @@ export class AuthController {
     // };
     const { user, token } = await this.authService.register(dto);
 
-    // SET COOKIE HERE
+    // SET COOKIE HERE - Environment-aware for local dev and Vercel
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false, // localhost only
-      sameSite: 'lax',
+      secure: isProduction, // true in production/Vercel (HTTPS), false for localhost
+      sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-domain (Vercel), 'lax' for localhost
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -41,7 +66,7 @@ export class AuthController {
   async login(
     @Body('email') email: string,
     @Body('password') password: string,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
     // const result = await this.authService.login(dto.email, dto.password);
 
@@ -58,11 +83,13 @@ export class AuthController {
     // };
     const { user, token } = await this.authService.login(email, password);
 
-    // SET COOKIE HERE
+    // SET COOKIE HERE - Environment-aware for local dev and Vercel
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProduction, // true in production/Vercel (HTTPS), false for localhost
+      sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-domain (Vercel), 'lax' for localhost
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -77,7 +104,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  async profile(@Req() req: any) {
+  async profile(@Req() req: AuthenticatedRequest) {
     if (!req.user) {
       throw new UnauthorizedException('User not authenticated');
     }
@@ -86,12 +113,10 @@ export class AuthController {
     return { data: profile };
   }
 
-
-
   //logout -> client-side keep endpoint for completeness (could be used to blacklist tokens)
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  async logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('token');
     return { success: true, message: 'Logged out successfully' };
   }
@@ -101,7 +126,7 @@ export class AuthController {
   @Roles('admin')
   @Get('users')
   async listUsers() {
-    const users = await this.authService.listUsers();
+    const users = (await this.authService.listUsers()) as unknown[];
     return { success: true, data: users };
   }
 }

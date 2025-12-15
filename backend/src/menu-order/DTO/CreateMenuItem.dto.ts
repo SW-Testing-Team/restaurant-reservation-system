@@ -14,7 +14,6 @@ export class CreateMenuItemDto {
   @IsString()
   category: string;
 
-  @IsString()
   @IsOptional()
   available?: boolean;
 

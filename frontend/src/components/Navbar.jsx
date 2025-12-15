@@ -3,9 +3,9 @@ import { AuthContext } from "../context/authContext";
 import { Menu, X, ChefHat } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 const Navbar = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
   const { user, loading } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
@@ -61,6 +61,9 @@ const Navbar = () => {
     if (pageName === "profile" && location.pathname === "/profile") {
       return "text-red-600 font-semibold transition";
     }
+    if (pageName === "dashboard" && location.pathname === "/admin/dashboard") {
+      return "text-red-600 font-semibold transition";
+    }
 
     return "text-gray-700 hover:text-red-600 transition";
   };
@@ -106,21 +109,24 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8 items-center">
-            <a href="/home" className={getNavLinkClass("home")}>
+          <div className="hidden lg:flex space-x-6 items-center">
+            <a
+              href="/home"
+              className={`whitespace-nowrap ${getNavLinkClass("home")}`}
+            >
               Home
             </a>
 
             {/* Menu and About links - work as anchors */}
             <button
               onClick={(e) => handleMenuClick(e, "menu")}
-              className="text-gray-700 hover:text-red-600 transition"
+              className="whitespace-nowrap text-gray-700 hover:text-red-600 transition"
             >
               Menu
             </button>
             <button
               onClick={(e) => handleMenuClick(e, "about")}
-              className="text-gray-700 hover:text-red-600 transition"
+              className="whitespace-nowrap text-gray-700 hover:text-red-600 transition"
             >
               About
             </button>
@@ -130,15 +136,19 @@ const Navbar = () => {
               <>
                 <a
                   href="/reservations"
-                  className={getNavLinkClass("reservations")}
+                  className={`whitespace-nowrap ${getNavLinkClass(
+                    "reservations"
+                  )}`}
                 >
-                  Make Reservation
+                  Reservations
                 </a>
                 <a
                   href="/my-reservations"
-                  className={getNavLinkClass("my-reservations")}
+                  className={`whitespace-nowrap ${getNavLinkClass(
+                    "my-reservations"
+                  )}`}
                 >
-                  My Reservations
+                  My Bookings
                 </a>
               </>
             )}
@@ -148,7 +158,7 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={handleAdminPanelClick}
-                  className={`flex items-center space-x-1 ${getNavLinkClass(
+                  className={`flex items-center space-x-1 whitespace-nowrap ${getNavLinkClass(
                     "admin"
                   )}`}
                 >
@@ -160,6 +170,13 @@ const Navbar = () => {
                     className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                   >
+                    <a
+                      href="/admin/dashboard"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
+                      onClick={handleAdminLinkClick}
+                    >
+                      Dashboard
+                    </a>
                     <a
                       href="/admin/reservations"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
@@ -175,16 +192,13 @@ const Navbar = () => {
                       Menu Management
                     </a>
 
-
                     <a
-                    href="/admin/restaurantFeedbacks"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
-                    onClick={handleAdminLinkClick}
-                  >
-                    View All Feedbacks
-                  </a>
-
-
+                      href="/admin/restaurantFeedbacks"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-red-600 transition"
+                      onClick={handleAdminLinkClick}
+                    >
+                      View All Feedbacks
+                    </a>
                   </div>
                 )}
               </div>
@@ -192,18 +206,18 @@ const Navbar = () => {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-3">
             {!loading && !user ? (
               <>
                 <a
                   href="/login"
-                  className="text-gray-700 hover:text-red-600 transition font-medium"
+                  className="text-gray-700 hover:text-red-600 transition font-medium whitespace-nowrap"
                 >
                   Login
                 </a>
                 <a
                   href="/register"
-                  className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition"
+                  className="bg-red-600 text-white px-5 py-2 rounded-full hover:bg-red-700 transition whitespace-nowrap text-sm"
                 >
                   Register
                 </a>
@@ -214,18 +228,21 @@ const Navbar = () => {
                 {showOrderButton && (
                   <button
                     onClick={() => navigate(`/order`)}
-                    className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition font-medium"
+                    className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition font-medium whitespace-nowrap text-sm"
                   >
-                    Start Ordering
+                    Order Now
                   </button>
                 )}
 
-                <a href="/profile" className={getNavLinkClass("profile")}>
+                <a
+                  href="/profile"
+                  className={`whitespace-nowrap ${getNavLinkClass("profile")}`}
+                >
                   Profile
                 </a>
                 <button
                   onClick={handleLogout}
-                  className="bg-gray-200 px-6 py-2 rounded-full hover:bg-gray-300 transition"
+                  className="bg-gray-200 px-4 py-2 rounded-full hover:bg-gray-300 transition whitespace-nowrap text-sm"
                 >
                   Logout
                 </button>
@@ -236,7 +253,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-700"
+            className="lg:hidden text-gray-700"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -249,7 +266,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t">
+        <div className="lg:hidden bg-white border-t">
           <div className="px-4 pt-2 pb-4 space-y-2">
             <a href="/home" className={`block py-2 ${getNavLinkClass("home")}`}>
               Home
@@ -293,6 +310,12 @@ const Navbar = () => {
                 <div className="text-gray-700 font-semibold py-2 border-t mt-2 pt-2">
                   Admin Panel
                 </div>
+                <a
+                  href="/admin/dashboard"
+                  className={`block py-2 pl-4 ${getNavLinkClass("admin")}`}
+                >
+                  Dashboard
+                </a>
                 <a
                   href="/admin/reservations"
                   className={`block py-2 pl-4 ${getNavLinkClass("admin")}`}

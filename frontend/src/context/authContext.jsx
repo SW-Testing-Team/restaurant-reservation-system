@@ -1,9 +1,9 @@
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
+import { API_URL } from "../config/api";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkLogin();
-  }, [API_URL]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading }}>
