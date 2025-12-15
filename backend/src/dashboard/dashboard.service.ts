@@ -156,5 +156,50 @@ export class DashboardService {
       },
     };
   }
+
+  async getRecentActivity() {
+    const recentReservations = await this.reservationModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    const recentOrders = await this.orderModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    const recentFeedback = await this.restaurantFeedbackModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    const activities = [
+      ...recentReservations.map((r: any) => ({
+        type: 'reservation',
+        date: r.createdAt || r.date,
+        details: `Table ${r.tableNumber} reserved`,
+        id: r._id,
+      })),
+      ...recentOrders.map((o: any) => ({
+        type: 'order',
+        date: o.createdAt,
+        details: `Order #${o._id}`,
+        id: o._id,
+      })),
+      ...recentFeedback.map((f: any) => ({
+        type: 'feedback',
+        date: f.createdAt,
+        details: `${f.rating}-star rating`,
+        id: f._id,
+      })),
+    ];
+
+    return activities
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 10);
+  }
 }
 

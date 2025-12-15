@@ -14,5 +14,12 @@ export class DashboardController {
   async getStatistics() {
     return this.dashboardService.getStatistics();
   }
+
+  @Get('recent-activity')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async getRecentActivity() {
+    return this.dashboardService.getRecentActivity();
+  }
 }
 

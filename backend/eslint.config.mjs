@@ -36,6 +36,15 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
       // Disable unnecessary type assertion warnings
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      // Disable unbound-method for Jest mocks (safe in test files)
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  // Override for test files
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
     },
   },
 );
