@@ -45,9 +45,7 @@ describe('AuthController (Unit)', () => {
     jest.clearAllMocks();
   });
 
-  // =============================
   // REGISTER
-  // =============================
   describe('register', () => {
     it('should register user and set cookie', async () => {
       const dto: any = { name: 'Test', email: 'test@test.com', password: '123' };
@@ -74,9 +72,7 @@ describe('AuthController (Unit)', () => {
     });
   });
 
-  // =============================
   // LOGIN
-  // =============================
   describe('login', () => {
     it('should login user and set cookie', async () => {
       const res = mockResponse();
@@ -95,9 +91,7 @@ describe('AuthController (Unit)', () => {
     });
   });
 
-  // =============================
   // PROFILE
-  // =============================
   describe('profile', () => {
     it('should return user profile', async () => {
       const req: any = { user: { id: '1' } };
@@ -116,9 +110,7 @@ describe('AuthController (Unit)', () => {
     });
   });
 
-  // =============================
   // LOGOUT
-  // =============================
   describe('logout', () => {
     it('should clear cookie', () => {
       const res = mockResponse();
@@ -130,9 +122,8 @@ describe('AuthController (Unit)', () => {
     });
   });
 
-  // =============================
   // LIST USERS
-  // =============================
+
   describe('listUsers', () => {
     it('should return all users', async () => {
       service.listUsers.mockResolvedValue([{ id: '1' }] as any);

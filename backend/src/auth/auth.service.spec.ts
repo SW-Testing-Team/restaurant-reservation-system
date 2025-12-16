@@ -49,9 +49,7 @@ describe('AuthService (Unit)', () => {
     jest.clearAllMocks();
   });
 
-  // =============================
   // REGISTER
-  // =============================
   describe('register', () => {
     it('should throw BadRequest if missing fields', async () => {
       await expect(service.register({} as any)).rejects.toThrow(
@@ -95,9 +93,7 @@ describe('AuthService (Unit)', () => {
     });
   });
 
-  // =============================
   // LOGIN
-  // =============================
   describe('login', () => {
     it('should throw BadRequest if missing fields', async () => {
       await expect(service.login('', '')).rejects.toThrow(
@@ -140,9 +136,7 @@ describe('AuthService (Unit)', () => {
     });
   });
 
-  // =============================
   // GET PROFILE
-  // =============================
   describe('getProfile', () => {
     it('should return user', async () => {
       repo.findById.mockResolvedValue({ id: '1' } as any);
@@ -160,9 +154,7 @@ describe('AuthService (Unit)', () => {
     });
   });
 
-  // =============================
   // LIST USERS
-  // =============================
   describe('listUsers', () => {
     it('should return users list', async () => {
       mockAuthRepo.userModel.exec.mockResolvedValue([{ id: '1' }]);
