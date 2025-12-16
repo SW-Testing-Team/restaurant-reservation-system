@@ -3,15 +3,15 @@ import { getModelToken } from '@nestjs/mongoose';
 import { FeedbackService } from '../feedback/feedback.service';
 import { RestaurantFeedback } from '../feedback/schemas/restaurant-feedback.schema';
 
-// Mock class for RestaurantFeedback model
+
 class MockRestaurantFeedback {
   constructor(private data: any) {}
 
   save = jest.fn().mockImplementation(() => this.data);
 
-  // Add static mocks for Mongoose static methods
+
   static find = jest.fn();
-  static findByIdAndUpdate: jest.Mock; // declare the type so TS knows it exists
+  static findByIdAndUpdate: jest.Mock; 
   static aggregate: jest.Mock;
   static countDocuments: jest.Mock;
 
@@ -20,6 +20,10 @@ class MockRestaurantFeedback {
 describe('FeedbackService', () => {
   let service: FeedbackService;
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
