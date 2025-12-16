@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
+import { UsersController } from './users.controller';
 import { AuthService } from './auth.service';
 import { AuthRepository } from './auth.repository';
 import { User, UserSchema } from './entities/user.schema';
@@ -36,7 +37,7 @@ import { CounterSchema } from 'src/common/schemas/counter.schema';
       { name: 'Counter', schema: CounterSchema },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, UsersController],
   providers: [AuthService, AuthRepository, JwtStrategy, RolesGuard],
   exports: [AuthService],
 })
