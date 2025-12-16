@@ -10,7 +10,7 @@ import MyReservations from "./Pages/MyReservationsPage";
 import AdminReservation from "./Pages/AdminReservation";
 import AdminRestaurantFeedbacks from "./Pages/AdminRestaurantFeedbacks";
 import CustomerReviewsPage from "./Pages/CustomerReviewsPage";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./Pages/AdminDashboard";
 
 function App() {
   return (

@@ -137,24 +137,7 @@ function Homepage() {
             </button>
           </a>
 
-          <a href="#top-rated">
-            {
-              <button
-                className="
-         ml-4
-         mt-5 px-6 py-3 rounded-full
-         text-white text-lg font-medium
-         bg-white/20
-         hover:bg-white/30
-         transition-all
-         backdrop-blur-sm
-         border border-white/30
-       "
-              >
-                ⭐️View Our Top Rated Items
-              </button>
-            }
-          </a>
+          
         </div>
       </section>
 
