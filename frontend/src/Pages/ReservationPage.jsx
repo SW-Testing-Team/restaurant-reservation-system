@@ -10,7 +10,7 @@ const ReservationPage = () => {
     date: "",
     time: "",
     guests: 2,
-    phoneNumber: user?.phone || ""
+    phoneNumber: user?.phone || "",
   });
   const [availableTables, setAvailableTables] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ const ReservationPage = () => {
   // Set user's phone number if available
   useEffect(() => {
     if (user?.phone) {
-      setFormData(prev => ({ ...prev, phoneNumber: user.phone }));
+      setFormData((prev) => ({ ...prev, phoneNumber: user.phone }));
     }
   }, [user]);
 
@@ -46,7 +46,7 @@ const ReservationPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!user) {
       setMessage("Please login to make a reservation");
       return;
@@ -66,10 +66,10 @@ const ReservationPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -102,7 +102,7 @@ const ReservationPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar currentPage="reservations" />
-      
+
       {/* Main Content - Fixed Structure */}
       <div className="pt-20 pb-8 px-4">
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
@@ -116,7 +116,14 @@ const ReservationPage = () => {
           {!user && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
               <p className="text-yellow-800 text-center">
-                Please <a href="/login" className="text-red-600 font-semibold hover:text-red-700">login</a> to make a reservation
+                Please{" "}
+                <a
+                  href="/login"
+                  className="text-red-600 font-semibold hover:text-red-700"
+                >
+                  login
+                </a>{" "}
+                to make a reservation
               </p>
             </div>
           )}
@@ -132,10 +139,12 @@ const ReservationPage = () => {
                 <input
                   type="date"
                   value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   required
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   disabled={!user}
                 />
               </div>
@@ -150,7 +159,9 @@ const ReservationPage = () => {
                 <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <select
                   value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, time: e.target.value })
+                  }
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   required
                   disabled={!user}
@@ -174,14 +185,19 @@ const ReservationPage = () => {
                 <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <select
                   value={formData.guests}
-                  onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      guests: parseInt(e.target.value),
+                    })
+                  }
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   required
                   disabled={!user}
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                     <option key={num} value={num}>
-                      {num} {num === 1 ? 'guest' : 'guests'}
+                      {num} {num === 1 ? "guest" : "guests"}
                     </option>
                   ))}
                 </select>
@@ -198,7 +214,9 @@ const ReservationPage = () => {
                 <input
                   type="tel"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phoneNumber: e.target.value })
+                  }
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   placeholder="01012345678"
                   pattern="01[0-2,5]{1}[0-9]{8}"
@@ -226,11 +244,13 @@ const ReservationPage = () => {
 
             {/* Message Display */}
             {message && (
-              <div className={`p-4 rounded-lg ${
-                message.includes("successfully") 
-                  ? "bg-green-50 border border-green-200 text-green-800"
-                  : "bg-red-50 border border-red-200 text-red-800"
-              }`}>
+              <div
+                className={`p-4 rounded-lg ${
+                  message.includes("successfully")
+                    ? "bg-green-50 border border-green-200 text-green-800"
+                    : "bg-red-50 border border-red-200 text-red-800"
+                }`}
+              >
                 {message}
               </div>
             )}

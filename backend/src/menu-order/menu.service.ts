@@ -121,6 +121,40 @@ export class MenuService {
     return savedItem;
   }
 
+  async assigncreateMenuItem(
+    menuId: string,
+    dto: CreateMenuItemDto,
+  ): Promise<MenuItem> {
+    if (!dto || !dto.name || dto.price == null || !dto.category) {
+      throw new BadRequestException('Invalid menu item payload');
+    }
+
+    const menuitem = await this.menuItemModel
+      .findOne({ name: dto.name, category: dto.category })
+      .exec();
+    if (menuitem) {
+      throw new BadRequestException(
+        `Menu item with name ${dto.name} in category ${dto.category} already exists`,
+      );
+    }
+
+    // 3. Create and save the MenuItem
+    const newItem = new this.menuItemModel({
+      name: dto.name,
+      description: dto.description,
+      price: dto.price,
+      category: dto.category,
+      available: dto.available ?? true,
+      imageUrl: dto.imageUrl,
+    });
+
+    const savedItem = await newItem.save();
+
+    await this.addMenuItem(menuId, savedItem._id.toString());
+
+    return savedItem;
+  }
+
   // Delete a menu
   async deleteMenu(id: string): Promise<Menu> {
     const menu = await this.menuModel.findById(id).exec();

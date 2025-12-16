@@ -21,8 +21,6 @@ export const AuthProvider = ({ children }) => {
 
           // FIXED: backend returns user directly
           setUser(data.data);
-        } else {
-          setUser(null);
         }
       } catch (err) {
         console.error("Profile fetch failed:", err);

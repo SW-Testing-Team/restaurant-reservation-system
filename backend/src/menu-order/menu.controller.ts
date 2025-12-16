@@ -6,16 +6,21 @@ import {
   Get,
   Delete,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { Menu } from './models/Menu.schema';
 import { MenuItem } from './models/MenuItem.schema';
 import { CreateMenuItemDto } from './DTO/CreateMenuItem.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
+//@UseGuards(JwtAuthGuard)
 @Controller('menu')
 export class MenuController {
   constructor(private readonly MenuService: MenuService) {}
-
+  //@Roles('admin')
   @Get()
   getAllMenus(): Promise<any> {
     return this.MenuService.getAllMenus();
@@ -35,12 +40,13 @@ export class MenuController {
     return this.MenuService.deleteMenu(menuId);
   }
 
-  @Post('/items')
+  @Post('/:id/items')
   createMenuItem(
+    @Param('id') menuId: string,
     @Body()
     dto: CreateMenuItemDto,
   ): Promise<MenuItem> {
-    return this.MenuService.createMenuItem(dto);
+    return this.MenuService.assigncreateMenuItem(menuId, dto);
   }
 
   @Patch(':id/items/:itemId')

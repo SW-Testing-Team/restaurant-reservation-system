@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { Star, Clock, CheckCircle } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { API_URL } from "../config/api";
+import { AuthContext } from "../context/authContext";
 
 function AdminRestaurantFeedbacks() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -15,6 +16,7 @@ function AdminRestaurantFeedbacks() {
   const [currentFeedback, setCurrentFeedback] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const [stats, setStats] = useState({
     totalFeedbacks: 0,
@@ -35,7 +37,6 @@ function AdminRestaurantFeedbacks() {
       }
     };
 
-
     const fetchStats = async () => {
       try {
         const res = await axios.get(`${API_URL}/feedback/restaurant/stats`);
@@ -44,16 +45,20 @@ function AdminRestaurantFeedbacks() {
         console.error("Failed to fetch stats:", err);
       }
     };
-
+    if (user && user.role !== "admin") {
+      alert("You are not authorized to access this page.");
+      throw new Error("Unauthorized");
+    }
     fetchFeedbacks();
-    fetchStats()
-  }, []);
+    fetchStats();
+  }, [user]);
 
   const { totalFeedbacks, pendingCount, repliedCount, averageRating } = stats;
 
-
-  if (loading) return <p className="p-8 text-center text-gray-500">Loading...</p>;
-  if (error) return <p className="p-8 text-center text-red-600">{error.message}</p>;
+  if (loading)
+    return <p className="p-8 text-center text-gray-500">Loading...</p>;
+  if (error)
+    return <p className="p-8 text-center text-red-600">{error.message}</p>;
 
   // Filter feedbacks based on search, status, and stars
   const filtered = feedbacks.filter((fb) => {
@@ -64,7 +69,8 @@ function AdminRestaurantFeedbacks() {
       fb.userId?.name?.toLowerCase().includes(searchText) ||
       fb.userId?.email?.toLowerCase().includes(searchText);
 
-    const matchesStatus = filterStatus === "all" ? true : fb.status === filterStatus;
+    const matchesStatus =
+      filterStatus === "all" ? true : fb.status === filterStatus;
     const matchesStars = filterStars === 0 ? true : fb.rating === filterStars;
 
     return matchesSearch && matchesStatus && matchesStars;
@@ -84,7 +90,12 @@ function AdminRestaurantFeedbacks() {
       setFeedbacks((prev) =>
         prev.map((fb) =>
           fb._id === currentFeedback._id
-            ? { ...fb, reply: replyMessage, status: "replied", replyDate: new Date() }
+            ? {
+                ...fb,
+                reply: replyMessage,
+                status: "replied",
+                replyDate: new Date(),
+              }
             : fb
         )
       );
@@ -100,48 +111,43 @@ function AdminRestaurantFeedbacks() {
     }
   };
 
+  const handleDelete = async (feedbackId) => {
+    if (!confirm("Are you sure you want to delete this feedback?")) return;
 
-const handleDelete = async (feedbackId) => {
-  if (!confirm("Are you sure you want to delete this feedback?")) return;
+    try {
+      await axios.delete(`${API_URL}/feedback/restaurant/${feedbackId}`, {
+        withCredentials: true,
+      });
 
-  try {
-    await axios.delete(`${API_URL}/feedback/restaurant/${feedbackId}`, {
-      withCredentials: true,
-    });
-
-    // Remove deleted feedback from state
-    setFeedbacks((prev) => prev.filter((fb) => fb._id !== feedbackId));
-    alert("Feedback deleted successfully");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to delete feedback");
-  }
-};
-
+      // Remove deleted feedback from state
+      setFeedbacks((prev) => prev.filter((fb) => fb._id !== feedbackId));
+      alert("Feedback deleted successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete feedback");
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  {/* Title and Back Button */}
-  <div className="flex items-center justify-between mb-10">
-    {/* Back Button */}
-    <button
-      onClick={() => window.history.back()}
-      className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium shadow-sm transition"
-    >
-      ← Back
-    </button>
+      {/* Title and Back Button */}
+      <div className="flex items-center justify-between mb-10">
+        {/* Back Button */}
+        <button
+          onClick={() => window.history.back()}
+          className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium shadow-sm transition"
+        >
+          ← Back
+        </button>
 
-    {/* Title centered */}
-    <h1 className="text-4xl font-semibold text-gray-800 tracking-wide absolute left-1/2 transform -translate-x-1/2">
-      Restaurant Feedback Dashboard
-    </h1>
+        {/* Title centered */}
+        <h1 className="text-4xl font-semibold text-gray-800 tracking-wide absolute left-1/2 transform -translate-x-1/2">
+          Restaurant Feedback Dashboard
+        </h1>
 
-    {/* Placeholder to balance flex space */}
-    <div className="w-24"></div>
-  </div>
-
-  
-
+        {/* Placeholder to balance flex space */}
+        <div className="w-24"></div>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
@@ -163,8 +169,10 @@ const handleDelete = async (feedbackId) => {
         <div className="bg-gradient-to-r from-teal-50 to-teal-100 text-gray-800 rounded-2xl shadow-lg p-6 flex flex-col items-center transition transform hover:scale-105">
           <Star className="h-8 w-8 mb-2 text-teal-600" />
           <span className="text-sm opacity-90">Avg Rating</span>
-          <span className="text-3xl font-bold">{(averageRating || 0).toFixed(1)}</span>
-          </div>
+          <span className="text-3xl font-bold">
+            {(averageRating || 0).toFixed(1)}
+          </span>
+        </div>
       </div>
 
       {/* Controls */}
@@ -215,24 +223,49 @@ const handleDelete = async (feedbackId) => {
         <table className="min-w-[950px] bg-white divide-y divide-gray-200 rounded-xl">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">User</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Message</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Rating</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Reply</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Admin</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Reply Date</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                User
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Message
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Rating
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Date
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Reply
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Admin
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Reply Date
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {filtered.map((fb) => (
-              <tr key={fb._id} className="bg-white hover:shadow-lg transition-all duration-200">
+              <tr
+                key={fb._id}
+                className="bg-white hover:shadow-lg transition-all duration-200"
+              >
                 <td className="px-4 py-2 whitespace-normal">
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-800">{fb.userId?.name || "Unknown"}</span>
-                    <span className="text-gray-500 text-xs">{fb.userId?.email || "-"}</span>
+                    <span className="font-medium text-gray-800">
+                      {fb.userId?.name || "Unknown"}
+                    </span>
+                    <span className="text-gray-500 text-xs">
+                      {fb.userId?.email || "-"}
+                    </span>
                   </div>
                 </td>
                 <td className="px-4 py-2 whitespace-normal max-w-[300px] break-words">
@@ -260,37 +293,42 @@ const handleDelete = async (feedbackId) => {
                     {fb.status.charAt(0).toUpperCase() + fb.status.slice(1)}
                   </span>
                 </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm">{fb.date ? new Date(fb.date).toLocaleDateString() : "-"}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-sm">
+                  {fb.date ? new Date(fb.date).toLocaleDateString() : "-"}
+                </td>
                 <td className="px-4 py-2 whitespace-normal max-w-[250px]">
                   <p className="text-gray-700 text-sm">{fb.reply || "-"}</p>
                 </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm">{fb.adminId?.name || "-"}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm">{fb.replyDate ? new Date(fb.replyDate).toLocaleString() : "-"}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-sm">
+                  {fb.adminId?.name || "-"}
+                </td>
+                <td className="px-4 py-2 whitespace-nowrap text-sm">
+                  {fb.replyDate ? new Date(fb.replyDate).toLocaleString() : "-"}
+                </td>
                 <td className="px-4 py-2 sticky right-0 bg-white border-l border-gray-200 z-10">
-  <div className="flex items-center justify-center gap-2 h-full">
-    {/* Reply Button */}
-    <button
-      className="bg-indigo-600 text-white px-2 py-1 rounded-lg hover:bg-indigo-700 transition text-xs shadow-sm"
-      onClick={() => {
-        setCurrentFeedback(fb);
-        setModalOpen(true);
-        setReplyMessage(fb.reply || "");
-      }}
-    >
-      Reply
-    </button>
+                  <div className="flex items-center justify-center gap-2 h-full">
+                    {/* Reply Button */}
+                    <button
+                      className="bg-indigo-600 text-white px-2 py-1 rounded-lg hover:bg-indigo-700 transition text-xs shadow-sm"
+                      onClick={() => {
+                        setCurrentFeedback(fb);
+                        setModalOpen(true);
+                        setReplyMessage(fb.reply || "");
+                      }}
+                    >
+                      Reply
+                    </button>
 
-    {/* Delete Icon Button */}
-    <button
-      className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition shadow-sm"
-      onClick={() => handleDelete(fb._id)}
-      title="Delete Feedback"
-    >
-      <Trash2 className="h-4 w-4" />
-    </button>
-  </div>
-</td>
-
+                    {/* Delete Icon Button */}
+                    <button
+                      className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition shadow-sm"
+                      onClick={() => handleDelete(fb._id)}
+                      title="Delete Feedback"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -303,10 +341,12 @@ const handleDelete = async (feedbackId) => {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative">
             <h2 className="text-xl font-semibold mb-4">Reply to Feedback</h2>
             <p className="mb-2">
-              <span className="font-medium">From:</span> {currentFeedback.userId?.name} ({currentFeedback.userId?.email})
+              <span className="font-medium">From:</span>{" "}
+              {currentFeedback.userId?.name} ({currentFeedback.userId?.email})
             </p>
             <p className="mb-4">
-              <span className="font-medium">Message:</span> {currentFeedback.message}
+              <span className="font-medium">Message:</span>{" "}
+              {currentFeedback.message}
             </p>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none mb-4"
@@ -343,4 +383,3 @@ const handleDelete = async (feedbackId) => {
 }
 
 export default AdminRestaurantFeedbacks;
-

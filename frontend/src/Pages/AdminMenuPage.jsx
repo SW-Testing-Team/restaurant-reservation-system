@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Plus, Edit2, Trash2, X, Save } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { API_URL } from "../config/api";
+import { AuthContext } from "../context/authContext";
 
 function AdminMenuPage() {
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useContext(AuthContext);
 
   // Modals state
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
@@ -24,18 +26,20 @@ function AdminMenuPage() {
     _id: null,
     menuId: "",
     name: "",
-    desc: "",
+    description: "",
     price: "",
     imageUrl: "",
-    ingredients: "",
+    category: "",
     allergens: "",
   });
 
   // Fetch all menus
   const fetchMenus = async () => {
     try {
+      console.log("user in fetchMenus:", user);
       setLoading(true);
       const response = await axios.get(`${API_URL}/menu`);
+      console.log("user:", user);
       setMenus(response.data);
     } catch (err) {
       setError(err.message);
@@ -45,8 +49,13 @@ function AdminMenuPage() {
   };
 
   useEffect(() => {
-    fetchMenus();
-  }, []);
+    if (user && user.role !== "admin") {
+      alert("You are not authorized to access this page.");
+      throw new Error("Unauthorized");
+    }
+    if (user) fetchMenus();
+    console.log("AdminMenuPage mounted with user:", user);
+  }, [user]);
 
   // Menu CRUD operations
   const handleCreateMenu = async () => {
@@ -91,11 +100,10 @@ function AdminMenuPage() {
     try {
       await axios.post(`${API_URL}/menu/${itemForm.menuId}/items`, {
         name: itemForm.name,
-        desc: itemForm.desc,
+        description: itemForm.description,
         price: parseFloat(itemForm.price),
         imageUrl: itemForm.imageUrl,
-        ingredients: itemForm.ingredients,
-        allergens: itemForm.allergens,
+        category: itemForm.category,
       });
       fetchMenus();
       closeItemModal();
@@ -106,17 +114,13 @@ function AdminMenuPage() {
 
   const handleUpdateItem = async () => {
     try {
-      await axios.put(
-        `${API_URL}/menu/${itemForm.menuId}/items/${itemForm._id}`,
-        {
-          name: itemForm.name,
-          desc: itemForm.desc,
-          price: parseFloat(itemForm.price),
-          imageUrl: itemForm.imageUrl,
-          ingredients: itemForm.ingredients,
-          allergens: itemForm.allergens,
-        }
-      );
+      await axios.patch(`${API_URL}/menu/items/${itemForm._id}`, {
+        name: itemForm.name,
+        description: itemForm.description,
+        price: parseFloat(itemForm.price),
+        imageUrl: itemForm.imageUrl,
+        category: itemForm.category,
+      });
       fetchMenus();
       closeItemModal();
     } catch (err) {
@@ -128,9 +132,7 @@ function AdminMenuPage() {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
 
     try {
-      await axios.delete(
-        `${API_URL}/menu/${menuId}/items/${itemId}`
-      );
+      await axios.delete(`${API_URL}/menu/${menuId}/items/${itemId}`);
       fetchMenus();
     } catch (err) {
       alert("Error deleting item: " + err.message);
@@ -162,10 +164,10 @@ function AdminMenuPage() {
         _id: item._id,
         menuId: menuId,
         name: item.name,
-        desc: item.desc,
+        description: item.description,
         price: item.price.toString(),
         imageUrl: item.imageUrl,
-        ingredients: item.ingredients || "",
+        category: item.category || "",
         allergens: item.allergens || "",
       });
     } else {
@@ -173,10 +175,10 @@ function AdminMenuPage() {
         _id: null,
         menuId: menuId,
         name: "",
-        desc: "",
+        description: "",
         price: "",
         imageUrl: "",
-        ingredients: "",
+        category: "",
         allergens: "",
       });
     }
@@ -189,10 +191,10 @@ function AdminMenuPage() {
       _id: null,
       menuId: "",
       name: "",
-      desc: "",
+      description: "",
       price: "",
       imageUrl: "",
-      ingredients: "",
+      category: "",
       allergens: "",
     });
   };
@@ -218,15 +220,17 @@ function AdminMenuPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Create Menu Button */}
-   <div className="mb-8 mt-8">  {/* Added mt-8 */}
-  <button
-    onClick={() => openMenuModal()}
-    className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center space-x-2"
-  >
-    <Plus className="h-5 w-5" />
-    <span>Create New Menu</span>
-  </button>
-</div>
+        <div className="mb-8 mt-8">
+          {" "}
+          {/* Added mt-8 */}
+          <button
+            onClick={() => openMenuModal()}
+            className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Create New Menu</span>
+          </button>
+        </div>
 
         {/* Menus List */}
         <div className="space-y-12">
@@ -290,14 +294,14 @@ function AdminMenuPage() {
                             <h3 className="font-semibold text-gray-800 text-lg">
                               {item.name}
                             </h3>
-                            {item.desc && (
+                            {item.description && (
                               <p className="text-gray-600 text-sm mt-1">
-                                {item.desc}
+                                {item.description}
                               </p>
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-4">
                           <span className="text-red-600 font-bold text-lg">
                             ${item.price.toFixed(2)}
@@ -310,7 +314,9 @@ function AdminMenuPage() {
                               Edit
                             </button>
                             <button
-                              onClick={() => handleDeleteItem(menu._id, item._id)}
+                              onClick={() =>
+                                handleDeleteItem(menu._id, item._id)
+                              }
                               className="bg-red-50 text-red-600 px-3 py-2 rounded hover:bg-red-100 transition text-sm font-medium"
                             >
                               Delete
@@ -481,9 +487,9 @@ function AdminMenuPage() {
                     Description *
                   </label>
                   <textarea
-                    value={itemForm.desc}
+                    value={itemForm.description}
                     onChange={(e) =>
-                      setItemForm({ ...itemForm, desc: e.target.value })
+                      setItemForm({ ...itemForm, description: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                     rows="3"
@@ -494,31 +500,16 @@ function AdminMenuPage() {
 
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ingredients
+                    category
                   </label>
                   <input
                     type="text"
-                    value={itemForm.ingredients}
+                    value={itemForm.category}
                     onChange={(e) =>
-                      setItemForm({ ...itemForm, ingredients: e.target.value })
+                      setItemForm({ ...itemForm, category: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                     placeholder="Tomatoes, Basil, Garlic, Olive Oil"
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Allergens
-                  </label>
-                  <input
-                    type="text"
-                    value={itemForm.allergens}
-                    onChange={(e) =>
-                      setItemForm({ ...itemForm, allergens: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                    placeholder="Gluten, Dairy, Nuts"
                   />
                 </div>
               </div>

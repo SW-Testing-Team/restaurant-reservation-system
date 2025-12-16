@@ -17,6 +17,11 @@ function OrderPage() {
   const [menuLoading, setMenuLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      alert("You must be logged in to place an order.");
+      window.location.href = "/login";
+      return;
+    }
     const fetchMenu = async () => {
       try {
         const response = await axios.get(`${API_URL}/menu`);
@@ -30,7 +35,7 @@ function OrderPage() {
     };
 
     fetchMenu();
-  }, []);
+  }, [user]);
 
   if (menuLoading) return <p>Loading menu...</p>;
   if (error) return <p>Error fetching menu: {error.message}</p>;

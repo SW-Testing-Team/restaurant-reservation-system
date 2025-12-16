@@ -36,6 +36,7 @@ const Navbar = () => {
       method: "POST",
       credentials: "include",
     });
+    navigate("/");
     window.location.reload();
   };
 

@@ -42,9 +42,12 @@ const AdminReservation = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    if (user && user.role === "admin") {
-      fetchAllReservations();
+    if (user && user.role !== "admin") {
+      alert("You are not authorized to access this page.");
+      throw new Error("Unauthorized");
     }
+    console.log("Admin user:", user);
+    fetchAllReservations();
   }, [user]);
 
   // Check availability when date/time changes in edit mode
