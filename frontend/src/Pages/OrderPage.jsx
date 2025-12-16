@@ -15,6 +15,9 @@ function OrderPage() {
   const [menu, setMenu] = useState([]);
   const [error, setError] = useState(null);
   const [menuLoading, setMenuLoading] = useState(true);
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [tablesLoading, setTablesLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -34,7 +37,36 @@ function OrderPage() {
       }
     };
 
+    const fetchTables = async () => {
+      try {
+        setTablesLoading(true);
+        const response = await axios.get(
+          `${API_URL}/reservations/my-reservations`,
+          {
+            withCredentials: true,
+          }
+        );
+        // Create table numbers based on users count or use user data
+        const userList = response.data.data || response.data;
+        setTables(userList);
+        if (orderType === "dine-in" && userList.length > 0) {
+          setSelectedTable(userList[0]._id || userList[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to fetch tables:", err);
+        // Create dummy tables if API fails
+        const dummyTables = Array.from({ length: 10 }, (_, i) => ({
+          _id: `table-${i + 1}`,
+          name: `Table ${i + 1}`,
+        }));
+        setTables(dummyTables);
+      } finally {
+        setTablesLoading(false);
+      }
+    };
+
     fetchMenu();
+    fetchTables();
   }, [user]);
 
   if (menuLoading) return <p>Loading menu...</p>;
@@ -87,21 +119,37 @@ function OrderPage() {
       alert("Your cart is empty!");
       return;
     }
+
+    if (orderType === "dine-in" && !selectedTable) {
+      alert("Please select a table!");
+      return;
+    }
+
     console.log("cart", cart);
-    axios.post(`${API_URL}/orders`, {
-      userId: user.id, //Replace with actual user ID
+    const orderData = {
+      userId: user.id,
       type: orderType,
       items: cart.map((item) => ({
         menuItemId: item._id,
         quantity: item.quantity,
       })),
       totalPrice: parseFloat(getTotal()),
-    });
+    };
+
+    // Add tableNumber if dine-in
+    if (orderType === "dine-in" && selectedTable) {
+      orderData.tableNumber = Number(selectedTable);
+    }
+    console.log("orderData", orderData);
+    axios.post(`${API_URL}/orders`, orderData);
 
     alert(
-      `Order placed successfully!\nType: ${orderType}\nTotal: $${getTotal()}`
+      `Order placed successfully!\nType: ${orderType}${
+        orderType === "dine-in" ? `\nTable: ${selectedTable}` : ""
+      }\nTotal: $${getTotal()}`
     );
     setCart([]);
+    setIsCartOpen(false);
   };
 
   const openItemModal = (item) => {
@@ -155,7 +203,12 @@ function OrderPage() {
 
           <div className="flex justify-center space-x-4 mb-8">
             <button
-              onClick={() => setOrderType("dine-in")}
+              onClick={() => {
+                setOrderType("dine-in");
+                if (tables.length > 0) {
+                  setSelectedTable(tables[0]._id || tables[0].id);
+                }
+              }}
               className={`px-8 py-3 rounded-full font-semibold transition ${
                 orderType === "dine-in"
                   ? "bg-red-600 text-white"
@@ -165,7 +218,10 @@ function OrderPage() {
               Dine In
             </button>
             <button
-              onClick={() => setOrderType("takeaway")}
+              onClick={() => {
+                setOrderType("takeaway");
+                setSelectedTable(null);
+              }}
               className={`px-8 py-3 rounded-full font-semibold transition ${
                 orderType === "takeaway"
                   ? "bg-red-600 text-white"
@@ -175,7 +231,10 @@ function OrderPage() {
               Takeaway
             </button>
             <button
-              onClick={() => setOrderType("delivery")}
+              onClick={() => {
+                setOrderType("delivery");
+                setSelectedTable(null);
+              }}
               className={`px-8 py-3 rounded-full font-semibold transition ${
                 orderType === "delivery"
                   ? "bg-red-600 text-white"
@@ -185,6 +244,33 @@ function OrderPage() {
               Delivery
             </button>
           </div>
+
+          {/* Table Selection for Dine-In */}
+          {orderType === "dine-in" && (
+            <div className="flex justify-center mb-8">
+              <div className="w-full max-w-md">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Select Table
+                </label>
+                <select
+                  value={selectedTable || ""}
+                  onChange={(e) => setSelectedTable(e.target.value)}
+                  disabled={tablesLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-transparent outline-none"
+                >
+                  <option value="">
+                    {tablesLoading ? "Loading tables..." : "Choose a table"}
+                  </option>
+                  {tables.map((table) => (
+                    <option key={table._id} value={table.tableNumber}>
+                      {`Table #${table.tableNumber} on ${table.date}` ||
+                        `Table ${table._id}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
