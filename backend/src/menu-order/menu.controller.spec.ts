@@ -10,6 +10,7 @@ describe('MenuController (Unit)', () => {
   const mockMenuService = {
     getAllMenus: jest.fn(),
     getMenuById: jest.fn(),
+    assigncreateMenuItem: jest.fn(),
     createMenu: jest.fn(),
     deleteMenu: jest.fn(),
     createMenuItem: jest.fn(),
@@ -115,11 +116,11 @@ describe('MenuController (Unit)', () => {
 
       const item = { name: 'Burger' };
 
-      service.createMenuItem.mockResolvedValue(item as any);
+      service.assigncreateMenuItem.mockResolvedValue(item as any);
 
-      const result = await controller.createMenuItem(dto);
+      const result = await controller.createMenuItem('1', dto);
 
-      expect(service.createMenuItem).toHaveBeenCalledWith(dto);
+      expect(service.assigncreateMenuItem).toHaveBeenCalledWith('1', dto);
       expect(result).toEqual(item);
     });
   });

@@ -138,7 +138,7 @@ function OrderPage() {
 
     // Add tableNumber if dine-in
     if (orderType === "dine-in" && selectedTable) {
-      orderData.tableNumber = Number(selectedTable);
+      orderData.tableNumber = Number(selectedT  able);
     }
     console.log("orderData", orderData);
     axios.post(`${API_URL}/orders`, orderData);
