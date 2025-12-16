@@ -5,13 +5,12 @@ import { NotFoundException } from '@nestjs/common';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let authService: Partial<AuthService>;
+  let authService: any; // <-- Using `any` to mock authRepo
 
   beforeEach(async () => {
     authService = {
       listUsers: jest.fn(),
       getProfile: jest.fn(),
-      // We'll mock authRepo for update and delete
       authRepo: {
         update: jest.fn(),
         delete: jest.fn(),
@@ -35,7 +34,7 @@ describe('UsersController', () => {
   describe('getAllUsers', () => {
     it('should return all users', async () => {
       const mockUsers = [{ id: '1', name: 'Alice' }];
-      (authService.listUsers as jest.Mock).mockResolvedValue(mockUsers);
+      authService.listUsers.mockResolvedValue(mockUsers);
 
       const result = await controller.getAllUsers();
 
@@ -47,7 +46,7 @@ describe('UsersController', () => {
   describe('getUserById', () => {
     it('should return a user if found', async () => {
       const mockUser = { id: '1', name: 'Alice' };
-      (authService.getProfile as jest.Mock).mockResolvedValue(mockUser);
+      authService.getProfile.mockResolvedValue(mockUser);
 
       const result = await controller.getUserById('1');
 
@@ -56,7 +55,7 @@ describe('UsersController', () => {
     });
 
     it('should throw NotFoundException if user not found', async () => {
-      (authService.getProfile as jest.Mock).mockResolvedValue(null);
+      authService.getProfile.mockResolvedValue(null);
 
       await expect(controller.getUserById('1')).rejects.toThrow(NotFoundException);
     });
@@ -66,7 +65,7 @@ describe('UsersController', () => {
     it('should update and return user', async () => {
       const updateData = { name: 'Bob' };
       const updatedUser = { id: '1', name: 'Bob' };
-      (authService.authRepo.update as jest.Mock).mockResolvedValue(updatedUser);
+      authService.authRepo.update.mockResolvedValue(updatedUser);
 
       const result = await controller.updateUser('1', updateData);
 
@@ -79,7 +78,7 @@ describe('UsersController', () => {
     });
 
     it('should throw NotFoundException if update fails', async () => {
-      (authService.authRepo.update as jest.Mock).mockResolvedValue(null);
+      authService.authRepo.update.mockResolvedValue(null);
 
       await expect(controller.updateUser('1', { name: 'Bob' })).rejects.toThrow(NotFoundException);
     });
@@ -87,7 +86,7 @@ describe('UsersController', () => {
 
   describe('deleteUser', () => {
     it('should delete user successfully', async () => {
-      (authService.authRepo.delete as jest.Mock).mockResolvedValue(true);
+      authService.authRepo.delete.mockResolvedValue(true);
 
       const result = await controller.deleteUser('1');
 
@@ -99,7 +98,7 @@ describe('UsersController', () => {
     });
 
     it('should throw NotFoundException if delete fails', async () => {
-      (authService.authRepo.delete as jest.Mock).mockResolvedValue(null);
+      authService.authRepo.delete.mockResolvedValue(null);
 
       await expect(controller.deleteUser('1')).rejects.toThrow(NotFoundException);
     });
