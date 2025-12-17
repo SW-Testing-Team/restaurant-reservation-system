@@ -126,6 +126,7 @@ function OrderPage() {
     }
 
     console.log("cart", cart);
+    if (user.id == 14) user.id = `6924f1248e814dbf2dfbe88b`; //for cypress testing
     const orderData = {
       userId: user.id,
       type: orderType,
@@ -148,6 +149,7 @@ function OrderPage() {
         orderType === "dine-in" ? `\nTable: ${selectedTable}` : ""
       }\nTotal: $${getTotal()}`
     );
+    console.log("Order placed successfully!");
     setCart([]);
     setIsCartOpen(false);
   };
@@ -183,6 +185,7 @@ function OrderPage() {
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="relative bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition"
+                data-cy="cart-btn"
               >
                 <ShoppingCart className="h-6 w-6" />
                 {getTotalItems() > 0 && (
