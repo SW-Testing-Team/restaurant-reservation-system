@@ -35,6 +35,14 @@ export class MenuController {
     return this.MenuService.createMenu(title);
   }
 
+  @Post('items')
+  createMenuItemStandalone(
+    @Body()
+    dto: CreateMenuItemDto,
+  ): Promise<MenuItem> {
+    return this.MenuService.createMenuItem(dto);
+  }
+
   @Delete(':id')
   deleteMenu(@Param('id') menuId: string): Promise<Menu> {
     return this.MenuService.deleteMenu(menuId);

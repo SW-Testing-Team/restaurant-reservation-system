@@ -41,6 +41,13 @@ export class MenuService {
   }
 
   async addMenuItem(menuId: string, menuitemId: string): Promise<Menu> {
+    // 0. Validate IDs exist
+    if (!menuId) {
+      throw new BadRequestException('menuId is invalid');
+    }
+    if (!menuitemId) {
+      throw new BadRequestException('menuitemId is invalid');
+    }
     // 1. Check menu exists
     const menu = await this.menuModel.findById(menuId).exec();
     if (!menu) {
@@ -167,10 +174,14 @@ export class MenuService {
 
   // Delete a MenuItem
   async deleteMenuItem(menuItemId: string): Promise<MenuItem> {
-    // 1. Check menu exists
+    // 1. Validate ID exists
+    if (!menuItemId) {
+      throw new BadRequestException('menuItemId is invalid');
+    }
+    // 2. Check menu item exists
     const menuItem = await this.menuItemModel.findById(menuItemId).exec();
     if (!menuItem) {
-      throw new NotFoundException(`Menu with ID ${menuItemId} not found`);
+      throw new NotFoundException(`Menu item with ID ${menuItemId} not found`);
     }
     await menuItem.deleteOne();
     return menuItem;
