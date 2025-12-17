@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { FeedbackService } from '../feedback/feedback.service';
 import { RestaurantFeedback } from '../feedback/schemas/restaurant-feedback.schema';
+import { ItemFeedback } from '../feedback/schemas/menu-item-feedback.schema';
 
 
 class MockRestaurantFeedback {
@@ -15,6 +16,16 @@ class MockRestaurantFeedback {
   static aggregate: jest.Mock;
   static countDocuments: jest.Mock;
 
+}
+
+class MockItemFeedback {
+  constructor(private data: any) {}
+
+  save = jest.fn().mockImplementation(() => this.data);
+
+  static find = jest.fn();
+  static findByIdAndUpdate: jest.Mock;
+  static countDocuments: jest.Mock;
 }
 
 describe('FeedbackService', () => {
@@ -31,6 +42,10 @@ describe('FeedbackService', () => {
         {
           provide: getModelToken(RestaurantFeedback.name),
           useValue: MockRestaurantFeedback,
+        },
+        {
+          provide: getModelToken(ItemFeedback.name),
+          useValue: MockItemFeedback,
         },
       ],
     }).compile();
