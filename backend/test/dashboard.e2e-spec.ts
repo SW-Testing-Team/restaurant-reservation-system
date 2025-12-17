@@ -72,7 +72,7 @@ describe('Dashboard (e2e)', () => {
     );
 
     // Create admin user
-    const adminEmail = `admin-e2e-${Date.now()}@test.com`;
+    const adminEmail = `admin-e2e-${Date.now()}-${Math.random().toString(36).substring(7)}@test.com`;
     const adminRegisterResponse = await request(app.getHttpServer())
       .post('/auth/register')
       .send({
@@ -103,7 +103,7 @@ describe('Dashboard (e2e)', () => {
     adminToken = tokenCookie?.split('=')[1]?.split(';')[0] || '';
 
     // Create customer user
-    const customerEmail = `customer-e2e-${Date.now()}@test.com`;
+    const customerEmail = `customer-e2e-${Date.now()}-${Math.random().toString(36).substring(7)}@test.com`;
     const customerRegisterResponse = await request(app.getHttpServer())
       .post('/auth/register')
       .send({

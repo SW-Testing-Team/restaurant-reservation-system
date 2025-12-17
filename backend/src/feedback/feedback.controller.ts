@@ -78,8 +78,15 @@ async getRestaurantFeedbackSorted() {
   return this.feedbackService.getRestaurantFeedbackSorted();
 }
 
-
-  }
-
-
-
+@Post('addItemFeedback/:menuItemId')
+@UseGuards(JwtAuthGuard)
+async createItemFeedback(
+  @Param('menuItemId') menuItemId: string,
+  @Body('message') message: string,
+  @Body('rating') rating: number,
+  @Req() req,
+) {
+  const userId = req.user.id;
+  return this.feedbackService.createItemFeedback(userId, menuItemId, message, rating);
+}
+}

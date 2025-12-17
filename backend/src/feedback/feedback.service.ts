@@ -12,6 +12,7 @@ import { Types, isValidObjectId } from 'mongoose';
 export class FeedbackService {
   constructor(
 @InjectModel(RestaurantFeedback.name) private restaurantFeedback: Model<RestaurantFeedbackDocument>,
+@InjectModel(ItemFeedback.name) private itemFeedback: Model<ItemFeedbackDocument>,
 ) {}
 
 
@@ -166,6 +167,22 @@ async getRecentRestaurantFeedbacks() {
 
 
 //items
+
+async createItemFeedback(userId: string, menuItemId: string, message: string, rating: number) {
+  const feedback = new this.itemFeedback({
+    userId,
+    menuItemId,
+    message,
+    rating,
+    date: new Date(),
+    reply: null,
+    replyDate: null,
+    status: 'pending',
+  });
+
+  const savedFeedback = await feedback.save();
+  return savedFeedback;
+}
 
   
   
