@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "target": "ES2023",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "types": ["cypress", "node"],
+      "skipLibCheck": true
+    },
+    "include": ["cypress/**/*.ts"]
+  }
+  
