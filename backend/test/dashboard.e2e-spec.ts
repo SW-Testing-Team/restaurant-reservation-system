@@ -190,9 +190,7 @@ describe('Dashboard (e2e)', () => {
       })
       .expect(201);
 
-    createdOrderIds.push(
-      order1Response.body._id || order1Response.body.id,
-    );
+    createdOrderIds.push(order1Response.body._id || order1Response.body.id);
 
     const order2Response = await request(app.getHttpServer())
       .post('/orders')
@@ -205,9 +203,7 @@ describe('Dashboard (e2e)', () => {
       })
       .expect(201);
 
-    createdOrderIds.push(
-      order2Response.body._id || order2Response.body.id,
-    );
+    createdOrderIds.push(order2Response.body._id || order2Response.body.id);
 
     const order3Response = await request(app.getHttpServer())
       .post('/orders')
@@ -220,40 +216,38 @@ describe('Dashboard (e2e)', () => {
       })
       .expect(201);
 
-    createdOrderIds.push(
-      order3Response.body._id || order3Response.body.id,
-    );
+    createdOrderIds.push(order3Response.body._id || order3Response.body.id);
 
     // Create reservations
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-      const reservation1Response = await request(app.getHttpServer())
-        .post('/reservations')
-        .set('Cookie', [`token=${customerToken}`])
-        .send({
-          date: tomorrowStr,
-          time: '18:00',
-          phoneNumber: '01234567890',
-          guests: 4,
-        })
-        .expect(201);
+    const reservation1Response = await request(app.getHttpServer())
+      .post('/reservations')
+      .set('Cookie', [`token=${customerToken}`])
+      .send({
+        date: tomorrowStr,
+        time: '18:00',
+        phoneNumber: '01234567890',
+        guests: 4,
+      })
+      .expect(201);
 
-      createdReservationIds.push(
-        reservation1Response.body._id || reservation1Response.body.id,
-      );
+    createdReservationIds.push(
+      reservation1Response.body._id || reservation1Response.body.id,
+    );
 
-      const reservation2Response = await request(app.getHttpServer())
-        .post('/reservations')
-        .set('Cookie', [`token=${customerToken}`])
-        .send({
-          date: tomorrowStr,
-          time: '19:00',
-          phoneNumber: '01234567891',
-          guests: 2,
-        })
-        .expect(201);
+    const reservation2Response = await request(app.getHttpServer())
+      .post('/reservations')
+      .set('Cookie', [`token=${customerToken}`])
+      .send({
+        date: tomorrowStr,
+        time: '19:00',
+        phoneNumber: '01234567891',
+        guests: 2,
+      })
+      .expect(201);
 
     createdReservationIds.push(
       reservation2Response.body._id || reservation2Response.body.id,
@@ -576,9 +570,7 @@ describe('Dashboard (e2e)', () => {
 
     it('should deny access to unauthenticated users (401 Unauthorized)', async () => {
       // Act & Assert
-      await request(app.getHttpServer())
-        .get('/dashboard/stats')
-        .expect(401);
+      await request(app.getHttpServer()).get('/dashboard/stats').expect(401);
     });
 
     it('should reject invalid tokens (401 Unauthorized)', async () => {
@@ -600,12 +592,12 @@ describe('Dashboard (e2e)', () => {
       expect(response.body.totalReservations).toBeGreaterThanOrEqual(2); // We created at least 2
       expect(response.body.totalOrders).toBeGreaterThanOrEqual(3); // We created at least 3
       expect(response.body.totalRevenue).toBeGreaterThan(0);
-      expect(response.body.feedbackSummary.totalFeedback).toBeGreaterThanOrEqual(
-        4,
-      ); // We created at least 4 feedback items
-      expect(response.body.feedbackSummary.averageRating).toBeGreaterThanOrEqual(
-        0,
-      );
+      expect(
+        response.body.feedbackSummary.totalFeedback,
+      ).toBeGreaterThanOrEqual(4); // We created at least 4 feedback items
+      expect(
+        response.body.feedbackSummary.averageRating,
+      ).toBeGreaterThanOrEqual(0);
       expect(response.body.feedbackSummary.averageRating).toBeLessThanOrEqual(
         5,
       );
@@ -647,4 +639,3 @@ describe('Dashboard (e2e)', () => {
     });
   });
 });
-
