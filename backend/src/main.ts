@@ -1,31 +1,36 @@
+// src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-
 import { ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+import * as cookieParser from 'cookie-parser';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import * as express from 'express';
 
-  app.use(cookieParser());
+const server = express();
+const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
+// Middleware
+app.use(cookieParser());
 
-  app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'https://restaurant-reservation-system-blond.vercel.app',
-      /vercel\.app$/, // allow all Vercel subdomains
-    ],
-    credentials: true,
-  });
-  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+// Global validation
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  }),
+);
 
-  await app.listen(port);
-}
+// CORS configuration
+app.enableCors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow server-to-server or Postman
+    if (origin === 'http://localhost:5173' || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+});
 
-void bootstrap();
+// Export server for Vercel serverless
+export default server;
