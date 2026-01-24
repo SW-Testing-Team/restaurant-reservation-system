@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { API_URL } from "../config/api";
+import.meta.env.VITE_API_URL;
 
 export const AuthContext = createContext();
 
