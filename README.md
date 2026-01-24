@@ -161,14 +161,14 @@ VITE_API_URL=http://localhost:3000
 
 ### Login Page
 
-![Login Page Screenshot]()
+
 <img width="1919" height="951" alt="Screenshot 2026-01-24 205035" src="https://github.com/user-attachments/assets/75f7abf6-f576-4ce1-a83c-c3dd02b981d3" />
 
 _User login and test credentials quick-fill buttons_
 
 ### Home Page / Dashboard
 
-![Home Page Screenshot]()
+
 _Main dashboard with featured dishes and restaurant info_
 <img width="1920" height="3872" alt="FireShot Capture 001 - Bella Vista -  localhost" src="https://github.com/user-attachments/assets/620b4765-1dac-4deb-8217-daacf4d2c817" />
 
@@ -179,26 +179,26 @@ _Main dashboard with featured dishes and restaurant info_
 
 ### Reservations
 
-![Reservations Screenshot]()
+
 _Make and manage table reservations_
 <img width="1914" height="949" alt="Screenshot 2026-01-24 205342" src="https://github.com/user-attachments/assets/e9f29bf1-8ac7-4fdc-b74b-56d708179baa" />
 <img width="1898" height="951" alt="Screenshot 2026-01-24 185247" src="https://github.com/user-attachments/assets/a45a6b9d-fbb2-4a92-bf3d-b86febd5ba89" />
 
 ### Orders
 
-![Orders Screenshot]()
+
 _View and place food orders_
 <img width="1896" height="952" alt="Screenshot 2026-01-24 184127" src="https://github.com/user-attachments/assets/83fed9e0-fa24-4765-ad30-45a3b8a30c9f" />
 
 ### Feedback
 
-![Feedback Screenshot]()
+
 _Leave reviews and ratings_
 <img width="1876" height="720" alt="Screenshot 2026-01-24 205451" src="https://github.com/user-attachments/assets/4a21017b-f856-490e-98bc-18ffb9a11f35" />
 
 ### Admin Dashboard
 
-![Admin Dashboard Screenshot]()
+
 _Admin overview of all operations_
 <img width="1903" height="947" alt="Screenshot 2026-01-24 184053" src="https://github.com/user-attachments/assets/843eb123-b8fc-4f0e-834d-98632ff9e1ea" />
 
@@ -297,4 +297,5 @@ For issues and questions, please open an issue on GitHub or contact the developm
 ## 📄 License
 
 This project is licensed under the UNLICENSED - see the LICENSE file for details.
+
 
