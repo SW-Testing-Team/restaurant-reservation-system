@@ -19,8 +19,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:5173',
-      'restaurant-reservation-system-blond.vercel.app',
-      /vercel\.app$/, // Allow all Vercel deployments
+      'https://restaurant-reservation-system-blond.vercel.app',
+      /vercel\.app$/, // allow all Vercel subdomains
     ],
     credentials: true,
   });
