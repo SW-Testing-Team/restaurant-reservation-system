@@ -195,6 +195,7 @@ _View and place food orders_
 
 _Leave reviews and ratings_
 <img width="1876" height="720" alt="Screenshot 2026-01-24 205451" src="https://github.com/user-attachments/assets/4a21017b-f856-490e-98bc-18ffb9a11f35" />
+<img width="1899" height="950" alt="Screenshot 2026-01-24 185314" src="https://github.com/user-attachments/assets/5bbcc366-d206-4b76-9afe-f7a3c3ca06d0" />
 
 ### Admin Dashboard
 
@@ -297,5 +298,6 @@ For issues and questions, please open an issue on GitHub or contact the developm
 ## 📄 License
 
 This project is licensed under the UNLICENSED - see the LICENSE file for details.
+
 
 
