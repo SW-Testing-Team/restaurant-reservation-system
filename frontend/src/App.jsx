@@ -5,14 +5,13 @@ import RestaurantHomepage from "./Pages/HomePage";
 import Register from "./Pages/Register";
 import Profile from "./Pages/Profile";
 import OrderPage from "./Pages/OrderPage";
-import MenuPage from "./Pages/MenuPage";
 import ReservationPage from "./Pages/ReservationPage";
 import MyReservations from "./Pages/MyReservationsPage";
 import AdminReservation from "./Pages/AdminReservation";
 import AdminRestaurantFeedbacks from "./Pages/AdminRestaurantFeedbacks";
 import CustomerReviewsPage from "./Pages/CustomerReviewsPage";
 import AdminDashboard from "./Pages/AdminDashboard";
-
+import MenuPage from "./Pages/MenuPage.jsx";
 function App() {
   return (
     <>
@@ -21,8 +20,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<RestaurantHomepage />} />
-        <Route path="/menu" element={<MenuPage />} />
         <Route path="/order" element={<OrderPage />} />
+        <Route path="/menu" element={<MenuPage />} />
         <Route path="/admin/menu" element={<AdminMenuPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/reservations" element={<ReservationPage />} />

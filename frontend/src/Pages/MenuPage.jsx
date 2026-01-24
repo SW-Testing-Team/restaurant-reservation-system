@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ChefHat, X } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function MenuPage() {
   const navigate = useNavigate();

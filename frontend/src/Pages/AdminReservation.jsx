@@ -16,7 +16,7 @@ import {
   Filter,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminReservation = () => {
   const { user } = useContext(AuthContext);
@@ -86,14 +86,14 @@ const AdminReservation = () => {
     setCheckingAvailability(true);
     try {
       const response = await fetch(
-        `${API_URL}/reservations/available?date=${editFormData.date}&time=${editFormData.time}`
+        `${API_URL}/reservations/available?date=${editFormData.date}&time=${editFormData.time}`,
       );
       if (response.ok) {
         let tables = await response.json();
 
         // If admin is changing to the same date/time, include the current table as available
         const currentReservation = reservations.find(
-          (r) => r._id === editingReservation
+          (r) => r._id === editingReservation,
         );
         if (
           currentReservation &&
@@ -133,7 +133,7 @@ const AdminReservation = () => {
       if (response.ok) {
         setMessage("Reservation cancelled successfully");
         setReservations(
-          reservations.filter((res) => res._id !== reservationId)
+          reservations.filter((res) => res._id !== reservationId),
         );
         setTimeout(() => setMessage(""), 3000);
       } else {
@@ -164,7 +164,7 @@ const AdminReservation = () => {
 
   const updateReservation = async (reservationId) => {
     const currentReservation = reservations.find(
-      (r) => r._id === reservationId
+      (r) => r._id === reservationId,
     );
     const isDateTimeChanged =
       editFormData.date !== currentReservation.date ||
@@ -246,7 +246,7 @@ const AdminReservation = () => {
   // Advanced Search and Filter Function
   const filteredReservations = reservations.filter((reservation) => {
     const reservationDateTime = new Date(
-      `${reservation.date}T${reservation.time}`
+      `${reservation.date}T${reservation.time}`,
     );
     const now = new Date();
 
@@ -275,7 +275,7 @@ const AdminReservation = () => {
       (reservation.phoneNumber &&
         reservation.phoneNumber.includes(searchTerm)) ||
       `reservation #${reservation._id.slice(-6).toUpperCase()}`.includes(
-        searchLower
+        searchLower,
       );
 
     // Date filter
@@ -369,7 +369,7 @@ const AdminReservation = () => {
                   <div className="text-2xl font-bold text-green-600">
                     {
                       reservations.filter(
-                        (r) => new Date(`${r.date}T${r.time}`) >= new Date()
+                        (r) => new Date(`${r.date}T${r.time}`) >= new Date(),
                       ).length
                     }
                   </div>
@@ -379,7 +379,7 @@ const AdminReservation = () => {
                   <div className="text-2xl font-bold text-gray-600">
                     {
                       reservations.filter(
-                        (r) => new Date(`${r.date}T${r.time}`) < new Date()
+                        (r) => new Date(`${r.date}T${r.time}`) < new Date(),
                       ).length
                     }
                   </div>
@@ -474,7 +474,7 @@ const AdminReservation = () => {
                         <option key={table} value={table}>
                           Table {table}
                         </option>
-                      )
+                      ),
                     )}
                   </select>
                 </div>
@@ -576,7 +576,7 @@ const AdminReservation = () => {
                           <span
                             className={`px-4 py-2 rounded-full text-sm font-semibold mt-2 sm:mt-0 ${getStatusColor(
                               reservation.date,
-                              reservation.time
+                              reservation.time,
                             )}`}
                           >
                             {getStatusText(reservation.date, reservation.time)}
@@ -633,8 +633,8 @@ const AdminReservation = () => {
                                           checkingAvailability
                                             ? "bg-blue-50 text-blue-800"
                                             : availableTables.length > 0
-                                            ? "bg-green-50 text-green-800"
-                                            : "bg-red-50 text-red-800"
+                                              ? "bg-green-50 text-green-800"
+                                              : "bg-red-50 text-red-800"
                                         }`}
                                       >
                                         {checkingAvailability ? (

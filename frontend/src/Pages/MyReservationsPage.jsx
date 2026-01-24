@@ -15,7 +15,7 @@ import {
 import Navbar from "../components/Navbar";
 import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const MyReservations = () => {
   const { user } = useContext(AuthContext);
@@ -75,7 +75,7 @@ const MyReservations = () => {
     setCheckingAvailability(true);
     try {
       const response = await fetch(
-        `${API_URL}/reservations/available-for-update/${editingReservation}?date=${editFormData.date}&time=${editFormData.time}`
+        `${API_URL}/reservations/available-for-update/${editingReservation}?date=${editFormData.date}&time=${editFormData.time}`,
       );
       if (response.ok) {
         const tables = await response.json();
@@ -107,7 +107,7 @@ const MyReservations = () => {
       if (response.ok) {
         setMessage("Reservation cancelled successfully");
         setReservations(
-          reservations.filter((res) => res._id !== reservationId)
+          reservations.filter((res) => res._id !== reservationId),
         );
         setTimeout(() => setMessage(""), 3000);
       } else {
@@ -312,7 +312,7 @@ const MyReservations = () => {
                           <span
                             className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
                               reservation.date,
-                              reservation.time
+                              reservation.time,
                             )}`}
                           >
                             {getStatusText(reservation.date, reservation.time)}
@@ -369,8 +369,8 @@ const MyReservations = () => {
                                           checkingAvailability
                                             ? "bg-blue-50 text-blue-800"
                                             : availableTables.length > 0
-                                            ? "bg-green-50 text-green-800"
-                                            : "bg-red-50 text-red-800"
+                                              ? "bg-green-50 text-green-800"
+                                              : "bg-red-50 text-red-800"
                                         }`}
                                       >
                                         {checkingAvailability ? (

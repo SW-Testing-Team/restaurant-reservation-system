@@ -19,7 +19,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Navbar from "../components/Navbar";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -150,18 +150,24 @@ function AdminDashboard() {
                 <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-3 rounded-xl shadow-lg">
                   <MessageSquare className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Feedback Summary</h2>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Feedback Summary
+                </h2>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
-                <p className="text-gray-600 text-sm font-medium mb-1">Total Feedback</p>
+                <p className="text-gray-600 text-sm font-medium mb-1">
+                  Total Feedback
+                </p>
                 <p className="text-3xl font-bold text-purple-700">
                   {stats?.feedbackSummary?.totalFeedback || 0}
                 </p>
               </div>
               <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4">
-                <p className="text-gray-600 text-sm font-medium mb-1">Average Rating</p>
+                <p className="text-gray-600 text-sm font-medium mb-1">
+                  Average Rating
+                </p>
                 <div className="flex items-center space-x-2">
                   <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
                   <p className="text-3xl font-bold text-yellow-700">
@@ -170,21 +176,27 @@ function AdminDashboard() {
                 </div>
               </div>
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
-                <p className="text-gray-600 text-sm font-medium mb-1">Pending</p>
+                <p className="text-gray-600 text-sm font-medium mb-1">
+                  Pending
+                </p>
                 <p className="text-3xl font-bold text-orange-700">
                   {stats?.feedbackSummary?.pendingFeedback || 0}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Awaiting reply</p>
               </div>
               <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
-                <p className="text-gray-600 text-sm font-medium mb-1">Replied</p>
+                <p className="text-gray-600 text-sm font-medium mb-1">
+                  Replied
+                </p>
                 <p className="text-3xl font-bold text-green-700">
                   {stats?.feedbackSummary?.repliedFeedback || 0}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Responded</p>
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
-                <p className="text-gray-600 text-sm font-medium mb-1">Breakdown</p>
+                <p className="text-gray-600 text-sm font-medium mb-1">
+                  Breakdown
+                </p>
                 <p className="text-lg font-semibold text-blue-700">
                   Restaurant: {stats?.feedbackSummary?.restaurantFeedback || 0}
                 </p>
@@ -381,10 +393,10 @@ function AdminDashboard() {
                                 index === 0
                                   ? "bg-yellow-100 text-yellow-700"
                                   : index === 1
-                                  ? "bg-gray-200 text-gray-700"
-                                  : index === 2
-                                  ? "bg-orange-100 text-orange-700"
-                                  : "bg-red-100 text-red-600"
+                                    ? "bg-gray-200 text-gray-700"
+                                    : index === 2
+                                      ? "bg-orange-100 text-orange-700"
+                                      : "bg-red-100 text-red-600"
                               }`}
                             >
                               {index + 1}

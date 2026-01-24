@@ -3,7 +3,7 @@ import axios from "axios";
 import { Star, ChevronLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CustomerAllReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -19,7 +19,6 @@ export default function CustomerAllReviewsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  
   const getInitials = (name) =>
     name
       ? name
@@ -61,9 +60,7 @@ export default function CustomerAllReviewsPage() {
             </p>
           )}
           {!loading && !error && reviews.length === 0 && (
-            <p className="text-center text-gray-600 text-lg">
-              No reviews yet.
-            </p>
+            <p className="text-center text-gray-600 text-lg">No reviews yet.</p>
           )}
 
           {/* Reviews Grid */}

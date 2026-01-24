@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { Calendar, Clock, Users, Phone } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ReservationPage = () => {
   const { user, loading: authLoading } = useContext(AuthContext);
@@ -33,7 +33,7 @@ const ReservationPage = () => {
   const checkAvailability = async () => {
     try {
       const response = await fetch(
-        `${API_URL}/reservations/available?date=${formData.date}&time=${formData.time}`
+        `${API_URL}/reservations/available?date=${formData.date}&time=${formData.time}`,
       );
       if (response.ok) {
         const tables = await response.json();

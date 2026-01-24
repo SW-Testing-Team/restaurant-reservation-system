@@ -2,11 +2,9 @@ import { useState, useContext } from "react";
 import { ChefHat, Mail, Lock, User, Phone } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config/api";
-
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Register() {
-
   const navigate = useNavigate();
 
   const { setUser } = useContext(AuthContext);
@@ -64,16 +62,13 @@ function Register() {
 
       setUser(data.data); // user info
       //alert("Registration successful!");
-      navigate("/home");;
-
+      navigate("/home");
     } catch (error) {
       console.error(error);
       //alert("Something went wrong");
       setErrorMessage("Server error. Please try again later.");
     }
   };
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4">

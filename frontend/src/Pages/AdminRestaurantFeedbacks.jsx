@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { Star, Clock, CheckCircle } from "lucide-react";
 import { Trash2 } from "lucide-react";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 import { AuthContext } from "../context/authContext";
 
 function AdminRestaurantFeedbacks() {
@@ -84,7 +84,7 @@ function AdminRestaurantFeedbacks() {
       await axios.patch(
         `${API_URL}/feedback/restaurant/${currentFeedback._id}/reply`,
         { reply: replyMessage },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       setFeedbacks((prev) =>
@@ -96,8 +96,8 @@ function AdminRestaurantFeedbacks() {
                 status: "replied",
                 replyDate: new Date(),
               }
-            : fb
-        )
+            : fb,
+        ),
       );
 
       setModalOpen(false);

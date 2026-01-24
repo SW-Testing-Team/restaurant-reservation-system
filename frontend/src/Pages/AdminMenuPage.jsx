@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Plus, Edit2, Trash2, X, Save } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { API_URL } from "../config/api";
+const API_URL = import.meta.env.VITE_API_URL;
 import { AuthContext } from "../context/authContext";
 
 function AdminMenuPage() {

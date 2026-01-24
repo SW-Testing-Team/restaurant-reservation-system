@@ -4,8 +4,8 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { Star, Clock, MapPin, Phone, ChefHat } from "lucide-react"; // icons
 import { Link } from "react-router-dom";
-import { API_URL } from "../config/api";
 
+const API_URL = import.meta.env.VITE_API_URL;
 // Mock Best Selling Dishes Data
 const bestSellingDishes = [
   {
