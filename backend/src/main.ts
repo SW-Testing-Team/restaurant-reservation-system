@@ -4,7 +4,6 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -20,7 +19,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:5173',
-      /vercel\.app$/,  // Allow all Vercel deployments
+      'https://restaurant-reservation-system-n0qej8tuh.vercel.app',
+      /vercel\.app$/, // Allow all Vercel deployments
     ],
     credentials: true,
   });
