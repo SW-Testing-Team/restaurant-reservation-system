@@ -5,6 +5,7 @@ import RestaurantHomepage from "./Pages/HomePage";
 import Register from "./Pages/Register";
 import Profile from "./Pages/Profile";
 import OrderPage from "./Pages/OrderPage";
+import MenuPage from "./Pages/MenuPage";
 import ReservationPage from "./Pages/ReservationPage";
 import MyReservations from "./Pages/MyReservationsPage";
 import AdminReservation from "./Pages/AdminReservation";
@@ -20,6 +21,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<RestaurantHomepage />} />
+        <Route path="/menu" element={<MenuPage />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/admin/menu" element={<AdminMenuPage />} />
         <Route path="/profile" element={<Profile />} />

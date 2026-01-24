@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/authContext";
 import { Menu, X, ChefHat } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config/api";
 
@@ -44,6 +44,10 @@ const Navbar = () => {
     // For admin pages, keep "Admin Panel" active
     if (pageName === "admin" && location.pathname.includes("/admin/")) {
       return "text-red-600 font-semibold transition";
+    }
+
+    if (pageName === "menu") {
+      return "text-gray-700 hover:text-red-600 transition";
     }
 
     // For regular pages
@@ -119,12 +123,13 @@ const Navbar = () => {
             </a>
 
             {/* Menu and About links - work as anchors */}
-            <button
-              onClick={(e) => handleMenuClick(e, "menu")}
-              className="whitespace-nowrap text-gray-700 hover:text-red-600 transition"
+            <a
+              href="/menu"
+              className={`whitespace-nowrap ${getNavLinkClass("menu")}`}
             >
-              Menu
-            </button>
+              menu
+            </a>
+
             <button
               onClick={(e) => handleMenuClick(e, "about")}
               className="whitespace-nowrap text-gray-700 hover:text-red-600 transition"
@@ -138,7 +143,7 @@ const Navbar = () => {
                 <a
                   href="/reservations"
                   className={`whitespace-nowrap ${getNavLinkClass(
-                    "reservations"
+                    "reservations",
                   )}`}
                 >
                   Reservations
@@ -146,7 +151,7 @@ const Navbar = () => {
                 <a
                   href="/my-reservations"
                   className={`whitespace-nowrap ${getNavLinkClass(
-                    "my-reservations"
+                    "my-reservations",
                   )}`}
                 >
                   My Bookings
@@ -160,7 +165,7 @@ const Navbar = () => {
                 <button
                   onClick={handleAdminPanelClick}
                   className={`flex items-center space-x-1 whitespace-nowrap ${getNavLinkClass(
-                    "admin"
+                    "admin",
                   )}`}
                 >
                   <span>Admin Panel</span>

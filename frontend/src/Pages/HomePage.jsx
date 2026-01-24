@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import Navbar from "../components/Navbar";
@@ -6,10 +6,105 @@ import { Star, Clock, MapPin, Phone, ChefHat } from "lucide-react"; // icons
 import { Link } from "react-router-dom";
 import { API_URL } from "../config/api";
 
+// Mock Best Selling Dishes Data
+const bestSellingDishes = [
+  {
+    id: 1,
+    name: "Spaghetti Carbonara",
+    price: 16.99,
+    description: "Creamy pasta with bacon, eggs, and parmesan cheese",
+    image:
+      "https://images.unsplash.com/photo-1612874742237-6526221fcf0f?w=400&h=300&fit=crop",
+    rating: 5,
+    reviews: 342,
+  },
+  {
+    id: 2,
+    name: "Margherita Pizza",
+    price: 14.99,
+    description: "Fresh tomatoes, mozzarella, basil, and olive oil",
+    image:
+      "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=400&h=300&fit=crop",
+    rating: 5,
+    reviews: 521,
+  },
+  {
+    id: 3,
+    name: "Risotto al Tartufo",
+    price: 22.99,
+    description: "Creamy arborio rice with black truffle and parmesan",
+    image:
+      "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop",
+    rating: 5,
+    reviews: 198,
+  },
+  {
+    id: 4,
+    name: "Tiramisu",
+    price: 8.99,
+    description: "Classic Italian dessert with mascarpone and cocoa",
+    image:
+      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+    rating: 5,
+    reviews: 612,
+  },
+  {
+    id: 5,
+    name: "Tiramisu",
+    price: 8.99,
+    description: "Classic Italian dessert with mascarpone and cocoa",
+    image:
+      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+    rating: 5,
+    reviews: 612,
+  },
+  {
+    id: 6,
+    name: "Tiramisu",
+    price: 8.99,
+    description: "Classic Italian dessert with mascarpone and cocoa",
+    image:
+      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+    rating: 5,
+    reviews: 612,
+  },
+  {
+    id: 7,
+    name: "Tiramisu",
+    price: 8.99,
+    description: "Classic Italian dessert with mascarpone and cocoa",
+    image:
+      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+    rating: 5,
+    reviews: 612,
+  },
+  {
+    id: 8,
+    name: "Tiramisu",
+    price: 8.99,
+    description: "Classic Italian dessert with mascarpone and cocoa",
+    image:
+      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+    rating: 5,
+    reviews: 612,
+  },
+  {
+    id: 9,
+    name: "Tiramisu",
+    price: 8.99,
+    description: "Classic Italian dessert with mascarpone and cocoa",
+    image:
+      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+    rating: 5,
+    reviews: 612,
+  },
+];
+
 function Homepage() {
   const { user, loading } = useContext(AuthContext);
   const [menu, setMenu] = useState([]);
   const [error, setError] = useState(null);
+  const scrollContainerRef = useRef(null);
 
   const handleLogout = async () => {
     await fetch(`${API_URL}/auth/logout`, {
@@ -45,7 +140,7 @@ function Homepage() {
     const fetchFeedbacks = async () => {
       try {
         const res = await axios.get(
-          `${API_URL}/feedback/restaurantFeedbacks/recent`
+          `${API_URL}/feedback/restaurantFeedbacks/recent`,
         );
         setFeedbacks(res.data);
       } catch (err) {
@@ -55,6 +150,38 @@ function Homepage() {
     };
     fetchFeedbacks();
   }, []);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const interval = setInterval(() => {
+      if (
+        container.scrollLeft + container.clientWidth >=
+        container.scrollWidth - 10
+      ) {
+        container.scrollLeft = 0;
+      } else {
+        container.scrollLeft += 1;
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Scroll button handlers
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -350, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 350, behavior: "smooth" });
+    }
+  };
 
   const handleSubmitFeedback = async () => {
     if (!newMessage || newRating === 0) {
@@ -71,7 +198,7 @@ function Homepage() {
           message: newMessage,
           rating: newRating,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       alert("Review added successfully!");
@@ -83,7 +210,7 @@ function Homepage() {
 
       // Refresh list
       const res = await axios.get(
-        `${API_URL}/feedback/restaurantFeedbacks/recent`
+        `${API_URL}/feedback/restaurantFeedbacks/recent`,
       );
       setFeedbacks(res.data);
     } catch (err) {
@@ -122,16 +249,27 @@ function Homepage() {
       {/* Hero Section */}
       <section
         id="home"
-        className="pt-16 bg-gradient-to-r from-red-600 to-orange-500 text-white"
+        className="relative pt-16 h-[800px] flex items-center justify-center text-white overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+        {/* Background Image */}
+        <img
+          src="https://www.sanziorestaurant.co.uk/wp-content/uploads/2021/04/Sanzio-restaurant-Outdoor-Dining-and-Takeways.jpg"
+          alt="Bella Vista Hero"
+          className="absolute inset-0 w-full h-full object-cover blur-sm scale-110"
+        />
+
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/40"></div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
             Welcome to Bella Vista
           </h1>
           <p className="text-xl md:text-2xl mb-8">
             Experience authentic Italian cuisine
           </p>
-          <a href="#menu">
+          <a href="/menu">
             <button className="bg-white text-red-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
               View Menu
             </button>
@@ -162,44 +300,92 @@ function Homepage() {
         </div>
       </section>
 
-      {/* Menu Section */}
+      {/* Best Sellers Section - Horizontal Scroll with Buttons */}
       <section id="menu" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center mb-12">Our Menu</h2>
+        <div className="px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Best Selling Dishes
+          </h2>
 
-          <div className="space-y-12">
-            {menu.map((section, idx) => (
-              <div key={idx}>
-                <h3 className="text-2xl font-bold text-red-600 mb-6 border-b-2 border-red-600 pb-2">
-                  {section.title}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {section.items.map((item, itemIdx) => (
-                    <div
-                      key={itemIdx}
-                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
-                    >
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="text-lg font-semibold text-gray-800">
-                            {item.name}
-                          </h4>
-                          <span className="text-red-600 font-bold">
-                            ${item.price}
-                          </span>
-                        </div>
-                        <p className="text-gray-600 text-sm">{item.desc}</p>
-                      </div>
+          <div className="relative flex items-center">
+            {/* Left Arrow Button */}
+            <button
+              onClick={scrollLeft}
+              className="absolute left-0 z-10 bg-red-600 hover:bg-red-700 text-white rounded-full p-3 shadow-lg transition"
+              aria-label="Scroll left"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+
+            {/* Scrollable Container */}
+            <div
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto gap-6 pb-4 scroll-smooth mx-16"
+              style={{ scrollBehavior: "smooth", scrollbarWidth: "none" }}
+            >
+              {bestSellingDishes.map((dish) => (
+                <div
+                  key={dish.id}
+                  className="flex-shrink-0 w-80 bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
+                >
+                  <img
+                    src={dish.image}
+                    alt={dish.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="text-lg font-semibold text-gray-800">
+                        {dish.name}
+                      </h4>
+                      <span className="text-red-600 font-bold">
+                        ${dish.price}
+                      </span>
                     </div>
-                  ))}
+                    <p className="text-gray-600 text-sm">{dish.description}</p>
+                    <div className="mt-3 flex items-center gap-1">
+                      <span className="text-yellow-400">★★★★★</span>
+                      <span className="text-gray-600 text-xs">
+                        ({dish.reviews})
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Right Arrow Button */}
+            <button
+              onClick={scrollRight}
+              className="absolute right-0 z-10 bg-red-600 hover:bg-red-700 text-white rounded-full p-3 shadow-lg transition"
+              aria-label="Scroll right"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </section>

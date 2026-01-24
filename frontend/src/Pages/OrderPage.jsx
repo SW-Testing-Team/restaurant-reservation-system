@@ -44,7 +44,7 @@ function OrderPage() {
           `${API_URL}/reservations/my-reservations`,
           {
             withCredentials: true,
-          }
+          },
         );
         // Create table numbers based on users count or use user data
         const userList = response.data.data || response.data;
@@ -80,8 +80,8 @@ function OrderPage() {
         cart.map((cartItem) =>
           cartItem._id === item._id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        )
+            : cartItem,
+        ),
       );
     } else {
       setCart([...cart, { ...item, quantity: 1 }]);
@@ -94,9 +94,9 @@ function OrderPage() {
         .map((item) =>
           item._id === id
             ? { ...item, quantity: Math.max(0, item.quantity + change) }
-            : item
+            : item,
         )
-        .filter((item) => item.quantity > 0)
+        .filter((item) => item.quantity > 0),
     );
   };
 
@@ -147,7 +147,7 @@ function OrderPage() {
     alert(
       `Order placed successfully!\nType: ${orderType}${
         orderType === "dine-in" ? `\nTable: ${selectedTable}` : ""
-      }\nTotal: $${getTotal()}`
+      }\nTotal: $${getTotal()}`,
     );
     console.log("Order placed successfully!");
     setCart([]);
