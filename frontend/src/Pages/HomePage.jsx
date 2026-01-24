@@ -10,11 +10,11 @@ import { API_URL } from "../config/api";
 const bestSellingDishes = [
   {
     id: 1,
-    name: "Spaghetti Carbonara",
-    price: 16.99,
-    description: "Creamy pasta with bacon, eggs, and parmesan cheese",
+    name: "Spaghetti Bolognese",
+    price: 14.0,
+    description: "Spaghetti with slow-cooked beef and tomato sauce",
     image:
-      "https://images.unsplash.com/photo-1612874742237-6526221fcf0f?w=400&h=300&fit=crop",
+      "https://www.kitchensanctuary.com/wp-content/uploads/2019/09/Spaghetti-Bolognese-square-FS-0204.jpg",
     rating: 5,
     reviews: 342,
   },
@@ -50,53 +50,34 @@ const bestSellingDishes = [
   },
   {
     id: 5,
-    name: "Tiramisu",
-    price: 8.99,
-    description: "Classic Italian dessert with mascarpone and cocoa",
+    name: "Quattro Formaggi",
+    price: 14,
+    description: "Mozzarella, gorgonzola, parmesan, and ricotta cheese blend.",
     image:
-      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+      "https://www.insidetherustickitchen.com/wp-content/uploads/2020/07/Quattro-formaggi-pizza-square-Inside-the-rustic-kitchen.jpg",
     rating: 5,
-    reviews: 612,
+    reviews: 502,
   },
   {
     id: 6,
-    name: "Tiramisu",
-    price: 8.99,
-    description: "Classic Italian dessert with mascarpone and cocoa",
+    name: "Fettuccine Alfredo",
+    price: 16.5,
+    description: "Creamy parmesan sauce with butter and garlic.",
     image:
-      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+      "https://www.eitanbernath.com/wp-content/uploads/2018/12/Eitan-Bernath-Fettuccine-Alfredo-819x1024.jpeg",
     rating: 5,
-    reviews: 612,
+    reviews: 467,
   },
   {
     id: 7,
-    name: "Tiramisu",
-    price: 8.99,
-    description: "Classic Italian dessert with mascarpone and cocoa",
+    name: "Caprese Salad",
+    price: 8,
+    description:
+      "Fresh mozzarella, ripe tomatoes, basil leaves, and balsamic glaze.",
     image:
-      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/b/b1/Caprese-1_%28tigher_crop%29.jpg",
     rating: 5,
-    reviews: 612,
-  },
-  {
-    id: 8,
-    name: "Tiramisu",
-    price: 8.99,
-    description: "Classic Italian dessert with mascarpone and cocoa",
-    image:
-      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
-    rating: 5,
-    reviews: 612,
-  },
-  {
-    id: 9,
-    name: "Tiramisu",
-    price: 8.99,
-    description: "Classic Italian dessert with mascarpone and cocoa",
-    image:
-      "https://static01.nyt.com/images/2017/04/05/dining/05COOKING-TIRAMISU1/05COOKING-TIRAMISU1-videoSixteenByNineJumbo1600.jpg",
-    rating: 5,
-    reviews: 612,
+    reviews: 423,
   },
 ];
 

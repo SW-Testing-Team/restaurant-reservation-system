@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config/api";
 
 const Login = () => {
-
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
@@ -56,6 +55,11 @@ const Login = () => {
       setErrorMessage("Server error. Please try again later.");
       //alert("Something went wrong");
     }
+  };
+
+  const fillTestCredentials = (email, password) => {
+    setFormData({ email, password });
+    setErrorMessage("");
   };
 
   return (
@@ -138,6 +142,28 @@ const Login = () => {
             >
               Login
             </button>
+
+            {/* Test Credentials Buttons */}
+            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() =>
+                  fillTestCredentials("admins@bellavista.com", "admin123")
+                }
+                className="bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition text-sm"
+              >
+                Test Admin
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  fillTestCredentials("user@bellavista.com", "user123")
+                }
+                className="bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-green-600 transition text-sm"
+              >
+                Test User
+              </button>
+            </div>
           </form>
         </div>
         {/* Bottom Buttons */}
